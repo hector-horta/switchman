@@ -1,0 +1,7 @@
+target/
+bin/
+obj/
+*.user
+*.partial
+code-reviews/
+scratch/

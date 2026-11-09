@@ -1,0 +1,13 @@
+[package]
+name = "ferro-link"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+ferro-link-core = { path = "../core" }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "std"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_System_Console"] }
