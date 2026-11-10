@@ -35,8 +35,8 @@
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="vm:RuleItem">
                         <StackPanel Padding="0,6">
-                            <TextBlock Text="{x:Bind Pattern, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBlock Text="{x:Bind BrowserId, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{x:Bind Title, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{x:Bind BrowserName, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>

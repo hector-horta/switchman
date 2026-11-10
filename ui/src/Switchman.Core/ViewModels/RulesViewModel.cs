@@ -34,9 +34,14 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
         Rules.Clear();
         foreach (var rule in (_session.Current?.Config ?? LinkConfig.Empty).Rules)
         {
-            Rules.Add(RuleItem.From(rule));
+            var item = RuleItem.From(rule);
+            item.NameLookup = NameOf;
+            Rules.Add(item);
         }
     }
+
+    /// <summary>Nombre visible de un navegador detectado; si no está, el id tal cual.</summary>
+    private string NameOf(string? id) => Browsers.FirstOrDefault(b => b.Id == id)?.Name ?? id ?? "";
 
     /// <summary>Quita una regla de la lista (se aplica al guardar).</summary>
     [RelayCommand]
@@ -78,7 +83,7 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
         {
             browserId = Browsers[0].Id;
         }
-        var rule = new RuleItem { Id = NextId(), Pattern = "", BrowserId = browserId };
+        var rule = new RuleItem { Id = NextId(), Pattern = "", BrowserId = browserId, NameLookup = NameOf };
         Rules.Add(rule);
         SelectedRule = rule;
     }
@@ -101,13 +106,8 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
     [RelayCommand]
     private async Task LoadAsync(CancellationToken ct)
     {
-        var config = await _session.LoadAsync(ct).ConfigureAwait(true);
-        if (!config.IsOk)
-        {
-            Message = config.Error;
-        }
-        FillRules();
-
+        // Navegadores primero: así cada regla resuelve su nombre al crearse y los ComboBox nunca
+        // ven su lista vaciarse con una regla ya enlazada.
         var browsers = await _cli.DetectAsync(ct).ConfigureAwait(true);
         Browsers.Clear();
         if (browsers.IsOk)
@@ -121,5 +121,12 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
         {
             Message = browsers.Error;
         }
+
+        var config = await _session.LoadAsync(ct).ConfigureAwait(true);
+        if (!config.IsOk)
+        {
+            Message = config.Error;
+        }
+        FillRules();
     }
 }

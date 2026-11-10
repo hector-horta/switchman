@@ -31,6 +31,23 @@ public sealed class RulesViewModelTests
     }
 
     [Fact]
+    public async Task ListShowsBrowserNamesAndPlaceholderForEmptyPattern()
+    {
+        var vm = Loaded();
+        await vm.LoadCommand.ExecuteAsync(null);
+
+        Assert.Equal("Google Chrome", vm.Rules[0].BrowserName);
+        Assert.Equal("edge", vm.Rules[1].BrowserName); // no detectado: se muestra el id
+        vm.Rules[1].BrowserId = "chrome";
+        Assert.Equal("Google Chrome", vm.Rules[1].BrowserName);
+
+        vm.AddRuleCommand.Execute(null);
+        Assert.Equal("Nueva regla: escribe un dominio", vm.Rules[2].Title);
+        vm.Rules[2].Pattern = "gitlab.com";
+        Assert.Equal("gitlab.com", vm.Rules[2].Title);
+    }
+
+    [Fact]
     public async Task AddRuleUsesNextIdAndDefaultBrowser()
     {
         var vm = Loaded();
