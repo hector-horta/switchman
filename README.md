@@ -156,6 +156,13 @@ dotnet test ui\Switchman.slnx
 powershell -ExecutionPolicy Bypass -File .\scripts\package.ps1
 ```
 
+### Releasing
+
+Bump `version` in `Cargo.toml` (`[workspace.package]`) and push to `main`. The
+[Release workflow](.github/workflows/release.yml) builds on Windows, runs clippy and all tests, packages
+the zip and publishes release `v<version>`. If that tag already exists it does nothing. It can also be run
+by hand from **Actions → Release** with `dry_run` to get the zip as an artifact without publishing.
+
 ### Layout
 
 ```text
