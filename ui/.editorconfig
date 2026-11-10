@@ -1,0 +1,6 @@
+root = false
+
+# Tests: los arreglos literales en Assert.Equal son legibles y no son código caliente.
+[tests/**.cs]
+dotnet_diagnostic.CA1861.severity = none
+

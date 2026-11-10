@@ -1,0 +1,4 @@
+T:System.Console;Usar ILogger, no la consola
+P:System.Diagnostics.ProcessStartInfo.Arguments;Usar ArgumentList: nunca concatenar argumentos
+M:System.Diagnostics.Process.Start(System.String);Usar ProcessStartInfo sin shell
+M:System.Diagnostics.Process.Start(System.String,System.String);Usar ProcessStartInfo sin shell
