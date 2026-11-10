@@ -11,8 +11,9 @@ public sealed partial class RuleItem : ObservableObject
     [ObservableProperty]
     public partial string Pattern { get; set; } = "";
 
+    /// <summary>Nullable a propósito: el ComboBox escribe null cuando no hay selección.</summary>
     [ObservableProperty]
-    public partial string BrowserId { get; set; } = "";
+    public partial string? BrowserId { get; set; } = "";
 
     [ObservableProperty]
     public partial bool StripTracking { get; set; } = true;
@@ -20,5 +21,5 @@ public sealed partial class RuleItem : ObservableObject
     public static RuleItem From(Rule rule) =>
         new() { Id = rule.Id, Pattern = rule.Pattern, BrowserId = rule.BrowserId, StripTracking = rule.StripTracking };
 
-    public Rule ToRule() => new(Id, Pattern.Trim(), BrowserId, StripTracking);
+    public Rule ToRule() => new(Id, Pattern.Trim(), BrowserId ?? "", StripTracking);
 }

@@ -15,6 +15,32 @@ public sealed class PagesViewModelTests
     private static AppStatus Status(bool http, bool https, Browser? fallback) =>
         new(new RegStatus(@"C:\fl.exe", http, https), @"C:\fl.exe", fallback);
 
+    /// <summary>
+    /// Regresión: un ComboBox con SelectedValue TwoWay escribe null en el id cuando su lista se vacía.
+    /// Con la config real (default "zen") Navegadores caía con NullReferenceException al cargar.
+    /// </summary>
+    [Fact]
+    public async Task BrowsersLoadSurvivesComboBoxWritingNull()
+    {
+        _cli.GetConfigReplies.Enqueue(FakeCli.Ok(new VersionedConfig("rev1", Config)));
+        _cli.DetectReply = FakeCli.Ok<IReadOnlyList<Browser>>([Brave, new("edge", "Edge", @"C:\e.exe", [])]);
+        _cli.StatusReply = FakeCli.Ok(Status(true, true, Brave));
+        var vm = new BrowsersViewModel(new ConfigSession(_cli, new FakeDialogs()), _cli);
+        vm.Browsers.CollectionChanged += (_, _) =>
+        {
+            if (vm.Browsers.Count == 0)
+            {
+                vm.DefaultBrowserId = null!;
+                vm.FallbackBrowserId = null!;
+            }
+        };
+
+        await vm.LoadCommand.ExecuteAsync(null);
+
+        Assert.Equal("edge", vm.DefaultBrowserId);
+        Assert.Equal("brave", vm.FallbackBrowserId);
+    }
+
     [Fact]
     public async Task BrowsersSaveSetsFallbackOnlyWhenChanged()
     {

@@ -62,7 +62,11 @@ internal sealed class FileLogger(FileLoggerProvider provider, string category) :
         if (!IsEnabled(logLevel)) { return; }
         var message = formatter(state, exception);
         var line = string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{DateTimeOffset.Now:O} {logLevel} {_category}: {message}");
-        if (exception is not null) { line += " | " + exception.GetType().Name + ": " + exception.Message; }
+        if (exception is not null)
+        {
+            // Con stack: sin él no se sabe dónde cayó la app.
+            line += " | " + exception;
+        }
         _provider.Write(line);
     }
 }

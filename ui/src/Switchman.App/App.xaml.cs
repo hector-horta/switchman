@@ -17,7 +17,21 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        // Tres vías: WinUI no ve las excepciones que escapan por CoreMessaging (0xc000027b)
+        // ni las de tareas sin observar; AppDomain registra lo que de todos modos va a cerrar la app.
         UnhandledException += (_, e) => AppServices.Logger.LogUnhandled(e.Exception);
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            if (e.ExceptionObject is Exception error)
+            {
+                AppServices.Logger.LogFatal(error);
+            }
+        };
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            AppServices.Logger.LogUnobserved(e.Exception);
+            e.SetObserved();
+        };
     }
 
     /// <summary>

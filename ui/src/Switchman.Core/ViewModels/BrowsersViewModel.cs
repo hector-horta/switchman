@@ -16,11 +16,13 @@ public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient 
 
     public ObservableCollection<Browser> Browsers { get; } = [];
 
+    /// <summary>Nullable a propósito: el ComboBox escribe null cuando no hay selección.</summary>
     [ObservableProperty]
-    public partial string DefaultBrowserId { get; set; } = "";
+    public partial string? DefaultBrowserId { get; set; } = "";
 
+    /// <summary>Nullable a propósito: el ComboBox escribe null cuando no hay selección.</summary>
     [ObservableProperty]
-    public partial string FallbackBrowserId { get; set; } = "";
+    public partial string? FallbackBrowserId { get; set; } = "";
 
     [ObservableProperty]
     public partial string Message { get; set; } = "";
@@ -29,14 +31,14 @@ public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient 
     [RelayCommand]
     private async Task SaveAsync(CancellationToken ct)
     {
-        var config = (_session.Current?.Config ?? LinkConfig.Empty) with { DefaultBrowserId = DefaultBrowserId };
+        var config = (_session.Current?.Config ?? LinkConfig.Empty) with { DefaultBrowserId = DefaultBrowserId ?? "" };
         var outcome = await _session.SaveAsync(config, ct).ConfigureAwait(true);
         Message = outcome.Message;
         if (outcome.Status == SaveStatus.Reloaded)
         {
             DefaultBrowserId = _session.Current?.Config.DefaultBrowserId ?? "";
         }
-        if (outcome.Status != SaveStatus.Saved || FallbackBrowserId.Length == 0 || FallbackBrowserId == _savedFallbackId)
+        if (outcome.Status != SaveStatus.Saved || string.IsNullOrEmpty(FallbackBrowserId) || FallbackBrowserId == _savedFallbackId)
         {
             return;
         }
@@ -55,19 +57,22 @@ public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient 
     [RelayCommand]
     private async Task LoadAsync(CancellationToken ct)
     {
-        var config = await _session.LoadAsync(ct).ConfigureAwait(true);
-        DefaultBrowserId = config.IsOk ? config.Value!.Config.DefaultBrowserId : "";
-        if (!config.IsOk) { Message = config.Error; }
-
+        // Primero la lista y después los ids: los ComboBox (SelectedValue TwoWay) escriben null en
+        // el id cuando su lista se vacía, así que asignarlos antes de llenarla los borraba.
         var browsers = await _cli.DetectAsync(ct).ConfigureAwait(true);
         Browsers.Clear();
         if (browsers.IsOk) { foreach (var browser in browsers.Value!) { Browsers.Add(browser); } }
         else { Message = browsers.Error; }
-        if (DefaultBrowserId.Length == 0 && Browsers.Count > 0)
+
+        var config = await _session.LoadAsync(ct).ConfigureAwait(true);
+        if (!config.IsOk) { Message = config.Error; }
+        var defaultId = config.Value?.Config.DefaultBrowserId ?? "";
+        if (defaultId.Length == 0 && Browsers.Count > 0)
         {
             // Config nueva: se propone el primero detectado; queda guardado al pulsar Guardar.
-            DefaultBrowserId = Browsers[0].Id;
+            defaultId = Browsers[0].Id;
         }
+        DefaultBrowserId = defaultId;
 
         var status = await _cli.StatusAsync(ct).ConfigureAwait(true);
         _savedFallbackId = status.Value?.Fallback?.Id ?? "";

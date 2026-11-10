@@ -16,6 +16,22 @@ public sealed partial class MainWindow : Window
         SetTitleBar(AppTitleBar);
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         AppWindow.SetIcon("Assets/AppIcon.ico");
+        FitToContent();
+    }
+
+    /// <summary>
+    /// Tamaño inicial acorde al contenido (las páginas de formulario miden ~700 px), centrado en la
+    /// pantalla. El tamaño por defecto de Windows dejaba media ventana vacía a la derecha.
+    /// </summary>
+    private void FitToContent()
+    {
+        const double Width = 1040, Height = 720;
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var scale = NativeMethods.GetDpiForWindow(hwnd) / 96.0;
+        var work = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
+        var w = Math.Min((int)(Width * scale), work.Width);
+        var h = Math.Min((int)(Height * scale), work.Height);
+        AppWindow.MoveAndResize(new Windows.Graphics.RectInt32(work.X + ((work.Width - w) / 2), work.Y + ((work.Height - h) / 2), w, h));
     }
 
     /// <summary>
