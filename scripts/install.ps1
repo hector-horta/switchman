@@ -2,7 +2,8 @@
 .SYNOPSIS
   Instala (o desinstala) Switchman para el usuario actual, sin permisos de administrador.
 .DESCRIPTION
-  Compila el CLI de Rust y publica la UI WinUI3, copia ambos a -Dest, crea el acceso directo
+  Desde el zip del release usa los ejecutables que trae; desde el código fuente compila el CLI de
+  Rust y publica la UI WinUI3. Copia ambos a -Dest, crea el acceso directo
   del menú Inicio y registra Switchman como navegador (abre Configuración para elegirlo).
   -Uninstall quita el registro, el acceso directo y la carpeta. Nunca borra la config del usuario
   (%LOCALAPPDATA%\Switchman).
@@ -38,21 +39,30 @@ if ($Uninstall) {
     return
 }
 
-Write-Host '==> Compilando el CLI de Rust'
-cargo build --release --manifest-path (Join-Path $root 'Cargo.toml')
-Assert-Ok 'cargo build'
+# Release: el zip trae los ejecutables junto a este script. Código fuente: se compila primero.
+if (Test-Path (Join-Path $PSScriptRoot 'Switchman.exe')) {
+    $publish = $PSScriptRoot
+    $cliSource = Join-Path $PSScriptRoot 'switchman-cli.exe'
+} else {
+    Write-Host '==> Compilando el CLI de Rust'
+    cargo build --release --manifest-path (Join-Path $root 'Cargo.toml')
+    Assert-Ok 'cargo build'
 
-Write-Host '==> Publicando la UI WinUI3'
-$publish = Join-Path $root 'target\publish'
-Remove-Item $publish -Recurse -Force -ErrorAction SilentlyContinue
-dotnet publish (Join-Path $root 'ui\src\Switchman.App\Switchman.App.csproj') -c Release -r win-x64 -p:Platform=x64 --self-contained -o $publish
-Assert-Ok 'dotnet publish'
+    Write-Host '==> Publicando la UI WinUI3'
+    $publish = Join-Path $root 'target\publish'
+    Remove-Item $publish -Recurse -Force -ErrorAction SilentlyContinue
+    dotnet publish (Join-Path $root 'ui\src\Switchman.App\Switchman.App.csproj') -c Release -r win-x64 -p:Platform=x64 --self-contained -o $publish
+    Assert-Ok 'dotnet publish'
+    $cliSource = Join-Path $root 'target\release\switchman-cli.exe'
+}
 
 Write-Host '==> Copiando archivos a la carpeta de destino'
 Stop-Switchman
 New-Item -ItemType Directory -Force $Dest | Out-Null
 Copy-Item (Join-Path $publish '*') $Dest -Recurse -Force
-Copy-Item (Join-Path $root 'target\release\switchman-cli.exe') $Dest -Force
+Copy-Item $cliSource $Dest -Force
+# Se deja una copia del script en la instalación para poder desinstalar sin el zip.
+Copy-Item $PSCommandPath (Join-Path $Dest 'install.ps1') -Force
 
 Write-Host '==> Comprobando que la UI instalada arranca'
 $probe = Start-Process (Join-Path $Dest 'Switchman.exe') -PassThru
