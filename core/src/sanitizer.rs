@@ -5,6 +5,7 @@ use url::Url;
 const TRACKING_PARAMS: &[&str] = &[
     "fbclid",
     "igshid",
+    "igsh", // Instagram reemplazó igshid por igsh en los enlaces compartidos
     "gclid",
     "gclsrc",
     "dclid",

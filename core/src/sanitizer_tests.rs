@@ -75,3 +75,10 @@ fn no_query_is_noop() {
         "https://example.com/path"
     );
 }
+
+#[test]
+fn strips_instagram_share_ids() {
+    let mut url = Url::parse("https://www.instagram.com/p/xyz/?igsh=MTIz&img_index=2").unwrap();
+    assert!(strip_tracking(&mut url, &[]));
+    assert_eq!(url.as_str(), "https://www.instagram.com/p/xyz/?img_index=2");
+}
