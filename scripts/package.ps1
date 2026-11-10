@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Arma el zip del release para Windows x64: target\dist\Switchman-<versión>-win-x64.zip
 .DESCRIPTION

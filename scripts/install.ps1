@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Instala (o desinstala) Switchman para el usuario actual, sin permisos de administrador.
 .DESCRIPTION
