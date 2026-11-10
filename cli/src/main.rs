@@ -38,6 +38,8 @@ fn main() -> ExitCode {
 }
 
 /// Registra en `%LOCALAPPDATA%\FerroLink\ferro-link.log` (sin consola visible).
+/// Si falla, no hay logger donde informarlo: se sigue sin log.
+#[allow(clippy::let_underscore_must_use)]
 fn init_logging() {
     let Ok(path) = ferro_link_core::paths::log_path() else {
         return;

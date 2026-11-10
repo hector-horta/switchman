@@ -47,17 +47,11 @@ const KNOWN: &[(&str, &str, &str)] = &[
 pub fn expand_vars(template: &str, env: &dyn Fn(&str) -> Option<String>) -> Option<String> {
     let mut out = String::new();
     let mut rest = template;
-    while let Some(start) = rest.find('%') {
-        out.push_str(&rest[..start]);
-        let after = &rest[start + 1..];
-        let end = after.find('%')?;
-        let name = &after[..end];
-        if let Some(val) = env(name) {
-            out.push_str(&val);
-        } else {
-            return None;
-        }
-        rest = &after[end + 1..];
+    while let Some((before, after)) = rest.split_once('%') {
+        out.push_str(before);
+        let (name, tail) = after.split_once('%')?;
+        out.push_str(&env(name)?);
+        rest = tail;
     }
     out.push_str(rest);
     Some(out)

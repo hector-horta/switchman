@@ -21,10 +21,9 @@ impl HostPattern {
         }
         rest = rest.strip_prefix("*.").unwrap_or(rest);
 
-        let (host, path) = match rest.find('/') {
-            Some(i) => (&rest[..i], &rest[i..]),
-            None => (rest, ""),
-        };
+        let (host, path) = rest
+            .split_once('/')
+            .map_or((rest, String::new()), |(h, p)| (h, format!("/{p}")));
 
         if host.is_empty() || host.contains('*') || host.contains(char::is_whitespace) {
             return Err(LinkError::InvalidPattern(pattern.to_string()));

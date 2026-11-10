@@ -13,12 +13,11 @@ const CLIENTS: &str = r"Software\Clients\StartMenuInternet";
 pub fn exe_from_command(cmd: &str) -> Option<String> {
     let cmd = cmd.trim();
     if let Some(rest) = cmd.strip_prefix('"') {
-        let end = rest.find('"')?;
-        return Some(rest[..end].to_string()).filter(|s| !s.is_empty());
+        let (exe, _) = rest.split_once('"')?;
+        return Some(exe.to_string()).filter(|s| !s.is_empty());
     }
-    let lower = cmd.to_ascii_lowercase();
-    let end = lower.find(".exe")? + 4;
-    Some(cmd[..end].to_string())
+    let end = cmd.to_ascii_lowercase().find(".exe")? + 4;
+    cmd.get(..end).map(str::to_string)
 }
 
 /// Convierte un nombre de clave del registro en una ID válida: letras/minúsculas ASCII y dígitos,

@@ -11,3 +11,6 @@ tracing-subscriber = { version = "0.3", default-features = false, features = ["f
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = ["Win32_System_Console"] }
+
+[lints]
+workspace = true

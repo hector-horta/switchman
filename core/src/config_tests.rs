@@ -1,3 +1,5 @@
+// La limpieza de directorios temporales es best-effort.
+#![allow(clippy::let_underscore_must_use)]
 use super::*;
 use crate::config_types::Rule;
 use std::fs;

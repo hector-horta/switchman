@@ -23,7 +23,9 @@ pub fn write_json_atomic<T: Serialize>(path: &Path, value: &T) -> Result<()> {
     let tmp = std::path::PathBuf::from(tmp);
     fs::write(&tmp, text)?;
     if let Err(e) = fs::rename(&tmp, path) {
-        let _ = fs::remove_file(&tmp);
+        if let Err(cleanup) = fs::remove_file(&tmp) {
+            tracing::warn!(error = %cleanup, "no se pudo borrar el archivo temporal");
+        }
         return Err(LinkError::Io(e));
     }
     Ok(())
