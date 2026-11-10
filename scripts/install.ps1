@@ -54,6 +54,14 @@ New-Item -ItemType Directory -Force $Dest | Out-Null
 Copy-Item (Join-Path $publish '*') $Dest -Recurse -Force
 Copy-Item (Join-Path $root 'target\release\switchman-cli.exe') $Dest -Force
 
+Write-Host '==> Comprobando que la UI instalada arranca'
+$probe = Start-Process (Join-Path $Dest 'Switchman.exe') -PassThru
+Start-Sleep -Seconds 5
+if ($probe.HasExited) {
+    throw "Switchman.exe se cerró al arrancar (código $($probe.ExitCode)); ver %LOCALAPPDATA%\Switchman\switchman-ui.log"
+}
+Stop-Process -Id $probe.Id -Force
+
 Write-Host '==> Creando acceso directo en el menú Inicio'
 $shell = New-Object -ComObject WScript.Shell
 $lnk = $shell.CreateShortcut($shortcut)
