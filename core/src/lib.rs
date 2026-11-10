@@ -8,6 +8,7 @@ pub mod matcher;
 pub mod paths;
 #[cfg(windows)]
 pub mod registry;
+pub mod revision;
 pub mod router;
 pub mod sanitizer;
 pub mod store;

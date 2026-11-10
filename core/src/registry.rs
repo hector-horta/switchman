@@ -8,6 +8,16 @@ use winreg::RegKey;
 pub const APP_NAME: &str = "FerroLink";
 const PROG_ID: &str = "FerroLinkURL";
 const CLIENTS: &str = r"Software\Clients\StartMenuInternet";
+const URL_ASSOC: &str = r"Software\Microsoft\Windows\Shell\Associations\UrlAssociations";
+
+/// Estado del registro de FerroLink en Windows (lo muestra la UI).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct RegStatus {
+    /// Ejecutable registrado en `FerroLinkURL`, si existe.
+    pub registered_exe: Option<String>,
+    pub default_http: bool,
+    pub default_https: bool,
+}
 
 /// Extrae la ruta completa del `.exe` de una línea de comandos del registro (con o sin comillas).
 pub fn exe_from_command(cmd: &str) -> Option<String> {
@@ -167,6 +177,42 @@ pub fn installed_browsers() -> Vec<Browser> {
         }
     }
     found
+}
+
+/// Obtiene el ID de programa asociado a un esquema de URL en Windows, priorizando la clave para el último usuario.
+fn default_prog_id(hkcu: &RegKey, scheme: &str) -> Option<String> {
+    let base = format!(r"{URL_ASSOC}\{scheme}");
+    hkcu.open_subkey(format!(r"{base}\UserChoiceLatest\ProgId"))
+        .and_then(|k| k.get_value::<String, _>("ProgId"))
+        .ok()
+        .filter(|s| !s.is_empty())
+        .or_else(|| {
+            hkcu.open_subkey(format!(r"{base}\UserChoice"))
+                .and_then(|k| k.get_value::<String, _>("ProgId"))
+                .ok()
+                .filter(|s| !s.is_empty())
+        })
+}
+
+/// Obtiene el estado actual del registro de FerroLink en HKEY_CURRENT_USER.
+pub fn status() -> RegStatus {
+    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+    let registered_exe = hkcu
+        .open_subkey(format!(r"Software\Classes\{PROG_ID}\shell\open\command"))
+        .and_then(|k| k.get_value::<String, _>(""))
+        .ok()
+        .and_then(|cmd| exe_from_command(&cmd));
+
+    let default_http =
+        default_prog_id(&hkcu, "http").is_some_and(|p| p.eq_ignore_ascii_case(PROG_ID));
+    let default_https =
+        default_prog_id(&hkcu, "https").is_some_and(|p| p.eq_ignore_ascii_case(PROG_ID));
+
+    RegStatus {
+        registered_exe,
+        default_http,
+        default_https,
+    }
 }
 
 #[cfg(test)]

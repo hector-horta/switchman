@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 ferro-link-core = { path = "../core" }
+serde = "1"
 serde_json = "1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "std"] }

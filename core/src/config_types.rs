@@ -15,7 +15,7 @@ pub struct Rule {
     pub strip_tracking: bool,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Config {
     pub default_browser_id: String,
     #[serde(default = "yes")]
@@ -26,4 +26,17 @@ pub struct Config {
     pub custom_browsers: Vec<Browser>,
     #[serde(default)]
     pub extra_tracking_params: Vec<String>,
+}
+
+/// Igual que un `config.json` vacío: la limpieza de rastreo viene activada.
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            default_browser_id: String::new(),
+            strip_tracking: yes(),
+            rules: Vec::new(),
+            custom_browsers: Vec::new(),
+            extra_tracking_params: Vec::new(),
+        }
+    }
 }

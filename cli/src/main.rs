@@ -1,11 +1,13 @@
 //! CLI de ferro-link: lo invoca Windows al abrir un enlace y la UI para configurar.
 #![cfg_attr(not(test), windows_subsystem = "windows")]
 mod commands;
+mod config_cmds;
 
+use ferro_link_core::error::LinkError;
 use std::process::ExitCode;
 use tracing::error;
 
-const USAGE: &str = "uso: ferro-link <open-url URL | test-url URL | detect | set-fallback ID | register | unregister>";
+const USAGE: &str = "uso: ferro-link <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | status | register | unregister>";
 
 /// Despacha el subcomando y devuelve 0 (ok), 1 (error) o 2 (uso incorrecto).
 fn main() -> ExitCode {
@@ -15,13 +17,17 @@ fn main() -> ExitCode {
     if cmd != "open-url" {
         attach_console();
     }
-    let result = match (cmd, args.get(1)) {
-        ("open-url", Some(url)) => commands::open_url(url),
-        ("test-url", Some(url)) => commands::test_url(url),
-        ("set-fallback", Some(id)) => commands::set_fallback(id),
-        ("detect", None) => commands::detect(),
-        ("register", None) => commands::register(),
-        ("unregister", None) => commands::unregister(),
+    let rest: Vec<&str> = args.iter().skip(1).map(String::as_str).collect();
+    let result = match (cmd, rest.as_slice()) {
+        ("open-url", [url]) => commands::open_url(url),
+        ("test-url", [url]) => commands::test_url(url),
+        ("set-fallback", [id]) => commands::set_fallback(id),
+        ("set-config", ["--revision", rev]) => config_cmds::set_config(rev),
+        ("get-config", []) => config_cmds::get_config(),
+        ("status", []) => config_cmds::status(),
+        ("detect", []) => commands::detect(),
+        ("register", []) => commands::register(),
+        ("unregister", []) => commands::unregister(),
         _ => {
             eprintln!("{USAGE}");
             return ExitCode::from(2);
@@ -32,7 +38,11 @@ fn main() -> ExitCode {
         Err(e) => {
             error!(error = %e, command = cmd, "fallo");
             eprintln!("error: {e}");
-            ExitCode::FAILURE
+            ExitCode::from(match e {
+                LinkError::Corrupt(_) => 3,
+                LinkError::Conflict => 4,
+                _ => 1,
+            })
         }
     }
 }

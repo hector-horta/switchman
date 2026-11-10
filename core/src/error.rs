@@ -17,6 +17,10 @@ pub enum LinkError {
     BrowserNotFound(String),
     #[error("se rechazó lanzar ferro-link sobre sí mismo")]
     SelfLaunch,
+    #[error("config.json corrupto: {0}")]
+    Corrupt(String),
+    #[error("config.json cambió desde que se leyó; recargar antes de guardar")]
+    Conflict,
 }
 
 pub type Result<T> = std::result::Result<T, LinkError>;

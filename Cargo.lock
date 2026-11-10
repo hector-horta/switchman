@@ -24,6 +24,7 @@ name = "ferro-link"
 version = "0.1.0"
 dependencies = [
  "ferro-link-core",
+ "serde",
  "serde_json",
  "tracing",
  "tracing-subscriber",
