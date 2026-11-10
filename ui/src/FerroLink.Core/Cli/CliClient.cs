@@ -16,6 +16,9 @@ public sealed class CliClient(IProcessRunner runner) : ICliClient
     public Task<CliResponse<SaveResult>> SetConfigAsync(LinkConfig config, string revision, CancellationToken ct) =>
         CallAsync(["set-config", "--revision", revision], JsonSerializer.Serialize(config, Json.LinkConfig), Json.SaveResult, ct);
 
+    public Task<CliResponse<SaveResult>> ResetConfigAsync(CancellationToken ct) =>
+        CallAsync(["reset-config"], null, Json.SaveResult, ct);
+
     public Task<CliResponse<IReadOnlyList<Browser>>> DetectAsync(CancellationToken ct) =>
         CallAsync(["detect"], null, Json.IReadOnlyListBrowser, ct);
 
@@ -39,7 +42,9 @@ public sealed class CliClient(IProcessRunner runner) : ICliClient
     {
         var result = await _runner.RunAsync(args, stdin, ct).ConfigureAwait(false);
         if (result.Exit != CliExit.Ok)
+        {
             return new CliResponse<T>(result.Exit, default, ErrorText(result));
+        }
 
         try
         {

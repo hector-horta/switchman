@@ -43,3 +43,10 @@ pub fn status() -> Result<()> {
         &json!({ "registry": registry::status(), "self_exe": self_exe, "fallback": fallback }),
     )
 }
+
+/// Aparta un config.json corrupto como `.bak` e imprime la revisión para guardar de cero.
+pub fn reset_config() -> Result<()> {
+    let revision = revision::reset(&paths::config_path()?)?;
+    info!("config.json apartado como .bak");
+    print_json(&json!({ "revision": revision }))
+}

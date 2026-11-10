@@ -7,6 +7,7 @@ public interface ICliClient
 {
     Task<CliResponse<VersionedConfig>> GetConfigAsync(CancellationToken ct);
     Task<CliResponse<SaveResult>> SetConfigAsync(LinkConfig config, string revision, CancellationToken ct);
+    Task<CliResponse<SaveResult>> ResetConfigAsync(CancellationToken ct);
     Task<CliResponse<IReadOnlyList<Browser>>> DetectAsync(CancellationToken ct);
     Task<CliResponse<RouteResult>> TestUrlAsync(string url, CancellationToken ct);
     Task<CliResponse<AppStatus>> StatusAsync(CancellationToken ct);

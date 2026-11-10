@@ -7,7 +7,7 @@ use ferro_link_core::error::LinkError;
 use std::process::ExitCode;
 use tracing::error;
 
-const USAGE: &str = "uso: ferro-link <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | status | register | unregister>";
+const USAGE: &str = "uso: ferro-link <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | register | unregister>";
 
 /// Despacha el subcomando y devuelve 0 (ok), 1 (error) o 2 (uso incorrecto).
 fn main() -> ExitCode {
@@ -24,6 +24,7 @@ fn main() -> ExitCode {
         ("set-fallback", [id]) => commands::set_fallback(id),
         ("set-config", ["--revision", rev]) => config_cmds::set_config(rev),
         ("get-config", []) => config_cmds::get_config(),
+        ("reset-config", []) => config_cmds::reset_config(),
         ("status", []) => config_cmds::status(),
         ("detect", []) => commands::detect(),
         ("register", []) => commands::register(),

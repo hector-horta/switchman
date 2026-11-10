@@ -1,5 +1,10 @@
 root = false
 
+# Llaves obligatorias: Cody las omite y así quitó la rama de un if (ConfigSession.SaveAsync).
+[*.cs]
+csharp_prefer_braces = true:error
+dotnet_diagnostic.IDE0011.severity = error
+
 # Tests: los arreglos literales en Assert.Equal son legibles y no son código caliente.
 [tests/**.cs]
 dotnet_diagnostic.CA1861.severity = none

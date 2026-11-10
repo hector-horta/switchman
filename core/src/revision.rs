@@ -64,6 +64,18 @@ pub fn save_versioned(path: &Path, config: &Config, expected: &str) -> Result<St
     Ok(revision_of(&written))
 }
 
+/// Aparta `config.json` (p. ej. corrupto) como `config.json.bak` para empezar de cero.
+/// Devuelve la revisión con la que guardar a continuación (`NO_FILE`).
+pub fn reset(path: &Path) -> Result<String> {
+    let mut bak = path.as_os_str().to_owned();
+    bak.push(".bak");
+    match std::fs::rename(path, std::path::PathBuf::from(bak)) {
+        Ok(()) => Ok(NO_FILE.to_string()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(NO_FILE.to_string()),
+        Err(e) => Err(LinkError::Io(e)),
+    }
+}
+
 #[cfg(test)]
 #[path = "revision_tests.rs"]
 mod tests;

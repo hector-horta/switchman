@@ -104,3 +104,22 @@ fn default_config_matches_empty_json() {
     assert_eq!(Config::default(), empty);
     assert!(Config::default().strip_tracking);
 }
+
+#[test]
+fn reset_moves_corrupt_file_to_bak() {
+    let path = temp_dir("reset").join("config.json");
+    fs::write(&path, "{ roto").unwrap();
+    assert_eq!(reset(&path).unwrap(), NO_FILE);
+    assert!(!path.exists());
+    assert_eq!(
+        fs::read_to_string(path.with_extension("json.bak")).unwrap(),
+        "{ roto"
+    );
+    save_versioned(&path, &sample(), NO_FILE).unwrap();
+}
+
+#[test]
+fn reset_without_file_is_ok() {
+    let path = temp_dir("reset-missing").join("config.json");
+    assert_eq!(reset(&path).unwrap(), NO_FILE);
+}
