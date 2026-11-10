@@ -63,6 +63,11 @@ public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient 
         Browsers.Clear();
         if (browsers.IsOk) { foreach (var browser in browsers.Value!) { Browsers.Add(browser); } }
         else { Message = browsers.Error; }
+        if (DefaultBrowserId.Length == 0 && Browsers.Count > 0)
+        {
+            // Config nueva: se propone el primero detectado; queda guardado al pulsar Guardar.
+            DefaultBrowserId = Browsers[0].Id;
+        }
 
         var status = await _cli.StatusAsync(ct).ConfigureAwait(true);
         _savedFallbackId = status.Value?.Fallback?.Id ?? "";

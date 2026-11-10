@@ -18,6 +18,11 @@ public sealed class ProcessRunner(string exePath, TimeSpan timeout) : IProcessRu
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            // El CLI de Rust habla UTF-8; sin esto .NET usa la página de códigos de la consola
+            // y rompe tildes en mensajes y en el JSON que se envía por stdin.
+            StandardInputEncoding = new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+            StandardErrorEncoding = System.Text.Encoding.UTF8,
         };
         foreach (var arg in args)
         {

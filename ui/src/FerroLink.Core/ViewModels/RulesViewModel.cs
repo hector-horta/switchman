@@ -17,6 +17,13 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
 
     public ObservableCollection<Browser> Browsers { get; } = [];
 
+    /// <summary>Regla que se edita en el formulario de la página.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSelection))]
+    public partial RuleItem? SelectedRule { get; set; }
+
+    public bool HasSelection => SelectedRule is not null;
+
     /// <summary>Resultado de la última acción, para el InfoBar.</summary>
     [ObservableProperty]
     public partial string Message { get; set; } = "";
@@ -33,15 +40,29 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
 
     /// <summary>Quita una regla de la lista (se aplica al guardar).</summary>
     [RelayCommand]
-    private void RemoveRule(RuleItem rule) => Rules.Remove(rule);
+    private void RemoveRule(RuleItem rule)
+    {
+        Rules.Remove(rule);
+        if (SelectedRule == rule)
+        {
+            SelectedRule = null;
+        }
+    }
 
     /// <summary>Guarda las reglas; si hubo conflicto y se recargó, refresca la lista.</summary>
     [RelayCommand]
     private async Task SaveAsync(CancellationToken ct)
     {
         var config = (_session.Current?.Config ?? LinkConfig.Empty) with { Rules = Rules.Select(r => r.ToRule()).ToList() };
+        var note = "";
+        if (config.DefaultBrowserId.Length == 0 && Browsers.Count > 0)
+        {
+            // Config nueva: sin navegador por defecto el CLI la rechaza. Se usa el primero detectado y se avisa.
+            config = config with { DefaultBrowserId = Browsers[0].Id };
+            note = $" · navegador por defecto: {Browsers[0].Name} (cámbialo en Navegadores)";
+        }
         var outcome = await _session.SaveAsync(config, ct).ConfigureAwait(true);
-        Message = outcome.Message;
+        Message = outcome.Status == SaveStatus.Saved ? outcome.Message + note : outcome.Message;
         if (outcome.Status == SaveStatus.Reloaded)
         {
             FillRules();
@@ -57,7 +78,9 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
         {
             browserId = Browsers[0].Id;
         }
-        Rules.Add(new RuleItem { Id = NextId(), Pattern = "", BrowserId = browserId });
+        var rule = new RuleItem { Id = NextId(), Pattern = "", BrowserId = browserId };
+        Rules.Add(rule);
+        SelectedRule = rule;
     }
 
     /// <summary>Siguiente id libre de la forma "rN".</summary>

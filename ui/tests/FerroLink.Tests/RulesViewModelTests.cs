@@ -83,4 +83,21 @@ public sealed class RulesViewModelTests
         Assert.Empty(vm.Rules);
         Assert.Equal("config.json corrupto", vm.Message);
     }
+
+    [Fact]
+    public async Task FirstSaveUsesFirstDetectedBrowserAsDefault()
+    {
+        _cli.GetConfigReplies.Enqueue(FakeCli.Ok(new VersionedConfig("none", LinkConfig.Empty)));
+        _cli.DetectReply = FakeCli.Ok<IReadOnlyList<Browser>>([Chrome]);
+        var vm = new RulesViewModel(new ConfigSession(_cli, new FakeDialogs()), _cli);
+        await vm.LoadCommand.ExecuteAsync(null);
+        vm.AddRuleCommand.Execute(null);
+        vm.Rules[0].Pattern = "github.com";
+        _cli.SetConfigReplies.Enqueue(FakeCli.Ok(new SaveResult("rev1")));
+
+        await vm.SaveCommand.ExecuteAsync(null);
+
+        Assert.Equal("chrome", _cli.LastSaved!.DefaultBrowserId);
+        Assert.Contains("Google Chrome", vm.Message, StringComparison.Ordinal);
+    }
 }
