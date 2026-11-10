@@ -97,11 +97,40 @@ pub fn set_fallback(id: &str) -> Result<()> {
 pub fn register() -> Result<()> {
     let exe = std::env::current_exe()?;
     registry::register(&exe)?;
-    std::process::Command::new("explorer.exe")
-        .arg(SETTINGS_URI)
-        .spawn()?;
     info!(exe = %exe.display(), "switchman registrado");
-    Ok(())
+    open_settings()
+}
+
+/// Abre la Configuración de Windows en la ficha de Switchman con `ShellExecuteW`.
+/// `explorer.exe <uri>` no entiende el parámetro `?registeredAppUser=` y abre el Explorador de archivos.
+fn open_settings() -> Result<()> {
+    use windows_sys::Win32::UI::Shell::ShellExecuteW;
+    use windows_sys::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
+    let wide = |s: &str| {
+        s.encode_utf16()
+            .chain(std::iter::once(0))
+            .collect::<Vec<u16>>()
+    };
+    let (verb, uri) = (wide("open"), wide(SETTINGS_URI));
+    // SAFETY: cadenas UTF-16 terminadas en 0 que viven durante toda la llamada; hwnd nulo es válido.
+    let code = unsafe {
+        ShellExecuteW(
+            std::ptr::null_mut(),
+            verb.as_ptr(),
+            uri.as_ptr(),
+            std::ptr::null(),
+            std::ptr::null(),
+            SW_SHOWNORMAL,
+        )
+    } as isize;
+    // ShellExecuteW devuelve un valor > 32 si tuvo éxito.
+    if code > 32 {
+        Ok(())
+    } else {
+        Err(LinkError::Io(std::io::Error::other(format!(
+            "no se pudo abrir Configuración (ShellExecuteW = {code})"
+        ))))
+    }
 }
 
 /// Elimina el registro de switchman en HKCU.

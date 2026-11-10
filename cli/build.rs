@@ -9,7 +9,10 @@ fn main() {
     let mut res = winresource::WindowsResource::new();
     res.set_icon("../assets/switchman.ico")
         .set("ProductName", "Switchman")
-        .set("FileDescription", "Switchman: enruta enlaces y quita parámetros de rastreo");
+        .set(
+            "FileDescription",
+            "Switchman: enruta enlaces y quita parámetros de rastreo",
+        );
     if let Err(e) = res.compile() {
         println!("cargo:warning=no se pudo incrustar el ícono: {e}");
     }
