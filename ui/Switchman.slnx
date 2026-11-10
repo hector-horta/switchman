@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Switchman.App/Switchman.App.csproj" />
+    <Project Path="src/Switchman.Core/Switchman.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Switchman.Tests/Switchman.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,12 +1,12 @@
-//! Subcomandos del CLI. Toda la lógica vive en `ferro_link_core`.
-use ferro_link_core::config::{self, Browser, Loaded};
-use ferro_link_core::error::{LinkError, Result};
-use ferro_link_core::{detector, launcher, paths, registry, router};
+//! Subcomandos del CLI. Toda la lógica vive en `switchman_core`.
 use serde_json::json;
+use switchman_core::config::{self, Browser, Loaded};
+use switchman_core::error::{LinkError, Result};
+use switchman_core::{detector, launcher, paths, registry, router};
 use tracing::{info, warn};
 
 /// URI de Configuración de Windows para elegir el navegador predeterminado.
-const SETTINGS_URI: &str = "ms-settings:defaultapps?registeredAppUser=FerroLink";
+const SETTINGS_URI: &str = "ms-settings:defaultapps?registeredAppUser=Switchman";
 
 /// Navegadores disponibles: personalizados, rutas conocidas y registrados en Windows (sin duplicados).
 fn all_browsers(loaded: &Loaded) -> Vec<Browser> {
@@ -45,7 +45,7 @@ fn route(raw: &str) -> Result<router::Decision> {
     let decision = match router::decide(&loaded, &browsers, raw) {
         Err(LinkError::BrowserNotFound(id)) => {
             warn!(%id, "navegador de la regla no encontrado; uso el respaldo");
-            let fallback = ferro_link_core::store::read_json::<Browser>(&paths::fallback_path()?)
+            let fallback = switchman_core::store::read_json::<Browser>(&paths::fallback_path()?)
                 .ok()
                 .or_else(|| browsers.first().cloned())
                 .ok_or(LinkError::BrowserNotFound(id))?;
@@ -100,13 +100,13 @@ pub fn register() -> Result<()> {
     std::process::Command::new("explorer.exe")
         .arg(SETTINGS_URI)
         .spawn()?;
-    info!(exe = %exe.display(), "ferro-link registrado");
+    info!(exe = %exe.display(), "switchman registrado");
     Ok(())
 }
 
-/// Elimina el registro de ferro-link en HKCU.
+/// Elimina el registro de switchman en HKCU.
 pub fn unregister() -> Result<()> {
     registry::unregister()?;
-    info!("ferro-link desregistrado");
+    info!("switchman desregistrado");
     Ok(())
 }

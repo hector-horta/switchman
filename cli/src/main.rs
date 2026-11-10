@@ -1,13 +1,13 @@
-//! CLI de ferro-link: lo invoca Windows al abrir un enlace y la UI para configurar.
+//! CLI de switchman: lo invoca Windows al abrir un enlace y la UI para configurar.
 #![cfg_attr(not(test), windows_subsystem = "windows")]
 mod commands;
 mod config_cmds;
 
-use ferro_link_core::error::LinkError;
 use std::process::ExitCode;
+use switchman_core::error::LinkError;
 use tracing::error;
 
-const USAGE: &str = "uso: ferro-link <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | register | unregister>";
+const USAGE: &str = "uso: switchman-cli <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | register | unregister>";
 
 /// Despacha el subcomando y devuelve 0 (ok), 1 (error) o 2 (uso incorrecto).
 fn main() -> ExitCode {
@@ -48,11 +48,11 @@ fn main() -> ExitCode {
     }
 }
 
-/// Registra en `%LOCALAPPDATA%\FerroLink\ferro-link.log` (sin consola visible).
+/// Registra en `%LOCALAPPDATA%\Switchman\switchman.log` (sin consola visible).
 /// Si falla, no hay logger donde informarlo: se sigue sin log.
 #[allow(clippy::let_underscore_must_use)]
 fn init_logging() {
-    let Ok(path) = ferro_link_core::paths::log_path() else {
+    let Ok(path) = switchman_core::paths::log_path() else {
         return;
     };
     if let Some(dir) = path.parent() {

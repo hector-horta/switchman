@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Switchman.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Switchman.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

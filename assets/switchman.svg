@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22436B"/>
+      <stop offset="1" stop-color="#0D1B2C"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg)"/>
+  <!-- Camino normal: sigue recto (apagado) -->
+  <path d="M96 150 V40" fill="none" stroke="#4E6C8F" stroke-width="26" stroke-linecap="round"/>
+  <!-- Camino elegido: tronco + desvío -->
+  <path d="M96 224 V150 C96 104 176 112 176 52" fill="none" stroke="#F5A524" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M150 64 L176 34 L202 64" fill="none" stroke="#F5A524" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- La aguja: el punto de cambio -->
+  <circle cx="96" cy="150" r="20" fill="#FFFFFF"/>
+  <circle cx="96" cy="150" r="9" fill="#0D1B2C"/>
+</svg>

@@ -1,4 +1,4 @@
-//! Errores del núcleo de ferro-link.
+//! Errores del núcleo de switchman.
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -15,7 +15,7 @@ pub enum LinkError {
     Io(#[from] std::io::Error),
     #[error("navegador no encontrado: {0}")]
     BrowserNotFound(String),
-    #[error("se rechazó lanzar ferro-link sobre sí mismo")]
+    #[error("se rechazó lanzar switchman sobre sí mismo")]
     SelfLaunch,
     #[error("config.json corrupto: {0}")]
     Corrupt(String),

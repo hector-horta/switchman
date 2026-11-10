@@ -1,11 +1,11 @@
 //! Subcomandos para la UI: `get-config`, `set-config --revision R` (JSON por stdin) y `status`.
 //! Salida JSON por stdout; errores por stderr con código 1, 3 (config corrupta) o 4 (conflicto).
-use ferro_link_core::config::Browser;
-use ferro_link_core::config_types::Config;
-use ferro_link_core::error::{LinkError, Result};
-use ferro_link_core::{paths, registry, revision, store};
 use serde_json::json;
 use std::io::Read;
+use switchman_core::config::Browser;
+use switchman_core::config_types::Config;
+use switchman_core::error::{LinkError, Result};
+use switchman_core::{paths, registry, revision, store};
 use tracing::info;
 
 /// Tamaño máximo aceptado por stdin para `set-config`.

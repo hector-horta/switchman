@@ -1,4 +1,4 @@
-//! Núcleo de ferro-link: limpieza de rastreo, reglas por dominio y lanzamiento de navegadores.
+//! Núcleo de switchman: limpieza de rastreo, reglas por dominio y lanzamiento de navegadores.
 pub mod config;
 pub mod config_types;
 pub mod detector;

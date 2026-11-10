@@ -1,10 +1,10 @@
-//! Rutas de datos de ferro-link bajo `%LOCALAPPDATA%\FerroLink`.
+//! Rutas de datos de switchman bajo `%LOCALAPPDATA%\Switchman`.
 use crate::error::{LinkError, Result};
 use std::path::PathBuf;
 
-const APP_DIR: &str = "FerroLink";
+const APP_DIR: &str = "Switchman";
 
-/// Devuelve la ruta absoluta al directorio de datos de FerroLink en `%LOCALAPPDATA%\FerroLink`.
+/// Devuelve la ruta absoluta al directorio de datos de Switchman en `%LOCALAPPDATA%\Switchman`.
 pub fn data_dir() -> Result<PathBuf> {
     let raw = std::env::var_os("LOCALAPPDATA")
         .ok_or_else(|| LinkError::Config("LOCALAPPDATA no definida".into()))?;
@@ -31,5 +31,5 @@ pub fn fallback_path() -> Result<PathBuf> {
 
 /// Registro de eventos del CLI.
 pub fn log_path() -> Result<PathBuf> {
-    Ok(data_dir()?.join("ferro-link.log"))
+    Ok(data_dir()?.join("switchman.log"))
 }

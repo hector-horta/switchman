@@ -1,19 +1,19 @@
-//! Registro de ferro-link como navegador (solo HKCU) y lectura de navegadores instalados.
+//! Registro de switchman como navegador (solo HKCU) y lectura de navegadores instalados.
 use crate::config::Browser;
 use crate::error::Result;
 use std::path::Path;
 use winreg::enums::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE};
 use winreg::RegKey;
 
-pub const APP_NAME: &str = "FerroLink";
-const PROG_ID: &str = "FerroLinkURL";
+pub const APP_NAME: &str = "Switchman";
+const PROG_ID: &str = "SwitchmanURL";
 const CLIENTS: &str = r"Software\Clients\StartMenuInternet";
 const URL_ASSOC: &str = r"Software\Microsoft\Windows\Shell\Associations\UrlAssociations";
 
-/// Estado del registro de FerroLink en Windows (lo muestra la UI).
+/// Estado del registro de Switchman en Windows (lo muestra la UI).
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct RegStatus {
-    /// Ejecutable registrado en `FerroLinkURL`, si existe.
+    /// Ejecutable registrado en `SwitchmanURL`, si existe.
     pub registered_exe: Option<String>,
     pub default_http: bool,
     pub default_https: bool,
@@ -60,7 +60,7 @@ pub fn slug(name: &str) -> String {
     out.trim_end_matches('-').to_string()
 }
 
-/// Registra FerroLink como navegador en HKEY_CURRENT_USER, configurando la clave de asociación de URL y el menú de inicio.
+/// Registra Switchman como navegador en HKEY_CURRENT_USER, configurando la clave de asociación de URL y el menú de inicio.
 pub fn register(exe: &Path) -> Result<()> {
     let exe = exe.display().to_string();
     let cmd = format!("\"{exe}\" open-url \"%1\"");
@@ -69,17 +69,17 @@ pub fn register(exe: &Path) -> Result<()> {
     let caps = format!(r"{client}\Capabilities");
     let classes = format!(r"Software\Classes\{PROG_ID}");
     let entries: Vec<(String, &str, String)> = vec![
-        (classes.clone(), "", "Ferro Link URL".to_string()),
+        (classes.clone(), "", "Switchman URL".to_string()),
         (format!(r"{classes}\DefaultIcon"), "", icon.clone()),
         (format!(r"{classes}\shell\open\command"), "", cmd.clone()),
-        (client.clone(), "", "Ferro Link".to_string()),
+        (client.clone(), "", "Switchman".to_string()),
         (format!(r"{client}\DefaultIcon"), "", icon.clone()),
         (
             format!(r"{client}\shell\open\command"),
             "",
             format!("\"{exe}\""),
         ),
-        (caps.clone(), "ApplicationName", "Ferro Link".to_string()),
+        (caps.clone(), "ApplicationName", "Switchman".to_string()),
         (
             caps.clone(),
             "ApplicationDescription",
@@ -110,7 +110,7 @@ pub fn register(exe: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Elimina todo lo registrado por FerroLink en HKEY_CURRENT_USER.
+/// Elimina todo lo registrado por Switchman en HKEY_CURRENT_USER.
 pub fn unregister() -> Result<()> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     for path in [
@@ -139,7 +139,7 @@ pub fn unregister() -> Result<()> {
 }
 
 /// Devuelve una lista de navegadores instalados en Windows registrados bajo StartMenuInternet,
-/// excluyendo FerroLink y omitiendo entradas con rutas de ejecutable inválidas.
+/// excluyendo Switchman y omitiendo entradas con rutas de ejecutable inválidas.
 pub fn installed_browsers() -> Vec<Browser> {
     let mut found = Vec::new();
     for root in [HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE] {
@@ -194,7 +194,7 @@ fn default_prog_id(hkcu: &RegKey, scheme: &str) -> Option<String> {
         })
 }
 
-/// Obtiene el estado actual del registro de FerroLink en HKEY_CURRENT_USER.
+/// Obtiene el estado actual del registro de Switchman en HKEY_CURRENT_USER.
 pub fn status() -> RegStatus {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let registered_exe = hkcu

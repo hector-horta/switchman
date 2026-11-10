@@ -6,7 +6,7 @@ use crate::config_types::Rule;
 use std::fs;
 
 fn temp_dir(name: &str) -> std::path::PathBuf {
-    let dir = std::env::temp_dir().join(format!("ferro-link-rev-{}-{}", name, std::process::id()));
+    let dir = std::env::temp_dir().join(format!("switchman-rev-{}-{}", name, std::process::id()));
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir

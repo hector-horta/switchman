@@ -1,10 +1,10 @@
 [package]
-name = "ferro-link-core"
+name = "switchman-core"
 version.workspace = true
 edition.workspace = true
 
 [lib]
-name = "ferro_link_core"
+name = "switchman_core"
 
 [dependencies]
 url = "2.5"

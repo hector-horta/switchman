@@ -1,9 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/FerroLink.App/FerroLink.App.csproj" />
-    <Project Path="src/FerroLink.Core/FerroLink.Core.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/FerroLink.Tests/FerroLink.Tests.csproj" />
-  </Folder>
-</Solution>
