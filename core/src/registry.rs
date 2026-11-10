@@ -20,11 +20,26 @@ pub fn exe_from_command(cmd: &str) -> Option<String> {
     cmd.get(..end).map(str::to_string)
 }
 
+/// Elimina el sufijo de instalación (hash o número) si cumple los criterios: contiene al menos un dígito y tiene longitud ≥12.
+fn strip_install_suffix(name: &str) -> &str {
+    name.rsplit_once(['-', '.']).map_or(name, |(head, tail)| {
+        if head.is_empty()
+            || tail.len() < 12
+            || !tail.chars().all(|c| c.is_ascii_alphanumeric())
+            || !tail.chars().any(|c| c.is_ascii_digit())
+        {
+            name
+        } else {
+            head
+        }
+    })
+}
+
 /// Convierte un nombre de clave del registro en una ID válida: letras/minúsculas ASCII y dígitos,
 /// separadores `-` únicos, máximo 64 caracteres.
 pub fn slug(name: &str) -> String {
     let mut out = String::new();
-    for c in name.trim().chars() {
+    for c in strip_install_suffix(name.trim()).chars() {
         if c.is_ascii_alphanumeric() {
             out.push(c.to_ascii_lowercase());
         } else if !out.is_empty() && !out.ends_with('-') {

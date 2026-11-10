@@ -20,6 +20,15 @@ fn all_browsers(loaded: &Loaded) -> Vec<Browser> {
     detector::merge(vec![custom, known, registry::installed_browsers()])
 }
 
+/// Config del usuario; si falta o está corrupta, una vacía (solo para listar navegadores).
+fn config_or_default() -> Result<Loaded> {
+    let config = config::load(&paths::config_path()?).unwrap_or_else(|e| {
+        warn!(error = %e, "config no disponible; uso una vacía");
+        Default::default()
+    });
+    Ok(Loaded::Config(config))
+}
+
 /// Decide navegador y URL; si falta la config usa el respaldo, y si falta este, el primer detectado.
 fn route(raw: &str) -> Result<router::Decision> {
     let loaded =
@@ -67,10 +76,7 @@ pub fn test_url(raw: &str) -> Result<()> {
 
 /// Imprime todos los navegadores detectados como un array JSON de objetos con sus IDs y nombres.
 pub fn detect() -> Result<()> {
-    let loaded = config::load(&paths::config_path()?)
-        .map(Loaded::Config)
-        .unwrap_or_else(|_| Loaded::Config(Default::default()));
-    let browsers = all_browsers(&loaded);
+    let browsers = all_browsers(&config_or_default()?);
     let out = serde_json::to_string(&browsers).map_err(|e| LinkError::Config(e.to_string()))?;
     println!("{out}");
     Ok(())
@@ -78,10 +84,7 @@ pub fn detect() -> Result<()> {
 
 /// Establece un navegador como respaldo para cuando no se encuentre la configuración principal.
 pub fn set_fallback(id: &str) -> Result<()> {
-    let loaded = config::load(&paths::config_path()?)
-        .map(Loaded::Config)
-        .unwrap_or_else(|_| Loaded::Config(Default::default()));
-    let browser = all_browsers(&loaded)
+    let browser = all_browsers(&config_or_default()?)
         .into_iter()
         .find(|b| b.id.eq_ignore_ascii_case(id.trim()))
         .ok_or_else(|| LinkError::BrowserNotFound(id.to_string()))?;
