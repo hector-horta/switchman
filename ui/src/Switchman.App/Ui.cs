@@ -20,7 +20,7 @@ internal static class Ui
 
     public static string DefaultState(bool isDefault) => isDefault
         ? "Switchman es el navegador predeterminado: los enlaces pasan por tus reglas."
-        : "Switchman no es el navegador predeterminado. Regístralo y elígelo en la Configuración de Windows.";
+        : "Switchman no es el navegador predeterminado. Pulsa «Registrar como predeterminado» y elígelo en la Configuración de Windows.";
 
     public static string RegisteredAt(AppStatus? status) => status?.Registry.RegisteredExe is { } exe
         ? "Registrado: " + exe

@@ -42,7 +42,7 @@
 
             <!-- Browser Registration Buttons -->
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Registrar como navegador"
+                <Button Content="Registrar como predeterminado"
                         Command="{x:Bind ViewModel.RegisterCommand}"/>
                 <Button Content="Quitar registro"
                         Command="{x:Bind ViewModel.UnregisterCommand}"/>
