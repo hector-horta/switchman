@@ -1,0 +1,95 @@
+# Release automático al subir la versión.
+#
+# Para publicar: cambia `version` en Cargo.toml ([workspace.package]) y haz push a main.
+# Si todavía no existe el tag v<versión>, este workflow compila en Windows, corre las
+# verificaciones, arma el zip con scripts/package.ps1 y crea el release con ese tag.
+# A mano (Actions → Release → Run workflow) con dry_run compila y deja el zip como
+# artefacto sin publicar nada.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: [Cargo.toml]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Compilar y empaquetar sin publicar el release
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # para ver los tags existentes
+
+      - name: Leer la versión
+        id: version
+        shell: pwsh
+        run: |
+          $version = (Select-String Cargo.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
+          $exists = [bool](git tag --list "v$version")
+          $dryRun = '${{ inputs.dry_run }}' -eq 'true'
+          $publish = -not $exists -and -not $dryRun
+          $build = $publish -or $dryRun
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "publish=$($publish.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          "build=$($build.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          if ($exists -and -not $dryRun) { Write-Host "v$version ya existe: no hay versión nueva que publicar." }
+
+      - name: Rust (clippy)
+        if: steps.version.outputs.build == 'true'
+        run: rustup component add clippy
+
+      - uses: Swatinem/rust-cache@v2
+        if: steps.version.outputs.build == 'true'
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.version.outputs.build == 'true'
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Verificar Rust
+        if: steps.version.outputs.build == 'true'
+        run: |
+          cargo clippy --workspace --all-targets -- -D warnings
+          cargo test --workspace
+
+      - name: Verificar C#
+        if: steps.version.outputs.build == 'true'
+        run: dotnet test ui/Switchman.slnx
+
+      - name: Empaquetar
+        if: steps.version.outputs.build == 'true'
+        shell: pwsh
+        run: ./scripts/package.ps1
+
+      - name: Subir el zip como artefacto
+        if: steps.version.outputs.build == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Switchman-${{ steps.version.outputs.version }}-win-x64
+          path: target/dist/Switchman-${{ steps.version.outputs.version }}-win-x64.zip
+          if-no-files-found: error
+
+      - name: Publicar el release
+        if: steps.version.outputs.publish == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "v$env:VERSION" "target/dist/Switchman-$env:VERSION-win-x64.zip" `
+            --target $env:GITHUB_SHA `
+            --title "Switchman $env:VERSION" `
+            --generate-notes
