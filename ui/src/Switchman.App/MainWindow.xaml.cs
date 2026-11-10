@@ -17,10 +17,16 @@ public sealed partial class MainWindow : Window
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         AppWindow.SetIcon("Assets/AppIcon.ico");
         FitToContent();
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            // Tamaño fijo: el contenido está diseñado para 1040x720 (sin bordes que estirar ni maximizar).
+            presenter.IsResizable = false;
+            presenter.IsMaximizable = false;
+        }
     }
 
     /// <summary>
-    /// Tamaño inicial acorde al contenido (las páginas de formulario miden ~700 px), centrado en la
+    /// Tamaño acorde al contenido (las páginas de formulario miden ~700 px), centrado en la
     /// pantalla. El tamaño por defecto de Windows dejaba media ventana vacía a la derecha.
     /// </summary>
     private void FitToContent()
