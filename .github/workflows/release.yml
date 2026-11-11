@@ -89,7 +89,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
+          # Notas: los commits desde la versión anterior (--generate-notes solo ve pull requests).
+          $previous = git describe --tags --abbrev=0 HEAD 2>$null
+          $range = if ($previous) { "$previous..HEAD" } else { 'HEAD' }
+          $commits = git log $range --no-merges --format='- %s'
+          $notes = @("### Cambios / Changes", '', $commits, '', "Instalación / Install: [README](https://github.com/${{ github.repository }}#installation)") -join "`n"
+          Set-Content release-notes.md $notes -Encoding utf8
           gh release create "v$env:VERSION" "target/dist/Switchman-$env:VERSION-win-x64.zip" `
             --target $env:GITHUB_SHA `
             --title "Switchman $env:VERSION" `
-            --generate-notes
+            --notes-file release-notes.md
