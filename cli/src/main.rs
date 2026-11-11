@@ -2,6 +2,7 @@
 #![cfg_attr(not(test), windows_subsystem = "windows")]
 mod commands;
 mod config_cmds;
+mod routing;
 
 use std::process::ExitCode;
 use switchman_core::error::LinkError;

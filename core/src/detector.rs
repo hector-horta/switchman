@@ -86,7 +86,9 @@ pub fn merge(lists: Vec<Vec<Browser>>) -> Vec<Browser> {
     let mut out: Vec<Browser> = Vec::new();
     for b in lists.into_iter().flatten() {
         let dup = out.iter().any(|o| {
-            o.id.eq_ignore_ascii_case(&b.id) || o.exe_path.eq_ignore_ascii_case(&b.exe_path)
+            // Misma ruta solo es duplicado con los mismos argumentos: las webapps comparten el exe del navegador.
+            o.id.eq_ignore_ascii_case(&b.id)
+                || (o.exe_path.eq_ignore_ascii_case(&b.exe_path) && o.args == b.args)
         });
         if !dup {
             out.push(b);

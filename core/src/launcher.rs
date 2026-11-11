@@ -27,6 +27,23 @@ pub fn same_exe(a: &Path, b: &Path) -> bool {
 /// Prefijo de rutas verbatim que agrega `canonicalize` en Windows.
 const VERBATIM_PREFIX: &str = r"\\?\";
 
+/// Marcador que se reemplaza por la URL dentro de un argumento (p. ej. webapps de Chromium:
+/// `--app-launch-url-for-shortcuts-menu-item={url}`).
+pub const URL_PLACEHOLDER: &str = "{url}";
+
+/// Convierte los argumentos del navegador en una lista de strings con la URL reemplazada si aparece el marcador `{url}`.
+pub fn launch_args(args: &[String], url: &str) -> Vec<String> {
+    if args.iter().any(|a| a.contains(URL_PLACEHOLDER)) {
+        args.iter()
+            .map(|a| a.replace(URL_PLACEHOLDER, url))
+            .collect()
+    } else {
+        let mut out = args.to_vec();
+        out.push(url.to_string());
+        out
+    }
+}
+
 /// Lanza el navegador especificado con la URL proporcionada, verificando primero que no se lance a sí mismo.
 pub fn launch(browser: &Browser, url: &Url, self_exe: &Path) -> Result<()> {
     let exe = Path::new(browser.exe_path.trim());
@@ -37,8 +54,7 @@ pub fn launch(browser: &Browser, url: &Url, self_exe: &Path) -> Result<()> {
         return Err(LinkError::BrowserNotFound(browser.exe_path.clone()));
     }
     Command::new(exe)
-        .args(&browser.args)
-        .arg(url.as_str())
+        .args(launch_args(&browser.args, url.as_str()))
         .spawn()?;
     Ok(())
 }

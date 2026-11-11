@@ -40,6 +40,9 @@ No network access, no telemetry, no account. Your configuration is a local JSON 
   Windows. Others can be added by hand in `config.json` (`custom_browsers`).
 - **Safe fallbacks**: if `config.json` is missing or damaged, links still open, in the fallback
   browser you chose (or the first one detected). A broken config never leaves you without a browser.
+- **Installed web apps as destinations**: apps installed from a Chromium browser (Helium, Chrome, Edge,
+  Brave → *Install app*) show up next to the browsers, e.g. "Instagram (app de Helium)". A rule like
+  `instagram.com` → that app opens the link **inside the app window**, not in a browser tab.
 - **Test without opening**: see which browser a link would go to and what the clean URL looks like.
 - **Edit-safe**: if `config.json` changes while the app is open (by hand or another window), the app
   asks whether to reload or overwrite instead of silently discarding either version.
@@ -104,6 +107,17 @@ The interface is in Spanish; English names are given in brackets.
 | **Navegadores** (Browsers) | Default browser (links with no rule) and fallback browser (used if `config.json` is missing or damaged). |
 | **Probar enlace** (Test link) | Paste a link and see the browser, the rule applied and the clean URL. Nothing is opened. |
 | **Ajustes** (Settings) | Tracking cleanup on/off, extra parameters, and the Windows default-browser status. |
+
+### Opening links in installed web apps
+
+Install the site as an app from your Chromium browser (*Install app* / *Install this site as an app*).
+Switchman finds it in the Start menu and lists it under **Navegadores**, so you can pick it in a rule:
+`instagram.com` → **Instagram (app de Helium)**. Each link opens in a new window of that app.
+
+Under the hood the app is launched as
+`chrome_proxy.exe --profile-directory=Default --app-id=<id> --app-launch-url-for-shortcuts-menu-item=<url>`.
+The same `{url}` placeholder works in your own `custom_browsers` entries: if an argument contains
+`{url}`, the link goes there; otherwise it is appended at the end.
 
 ### Files
 

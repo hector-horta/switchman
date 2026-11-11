@@ -1,24 +1,13 @@
 //! Subcomandos del CLI. Toda la lógica vive en `switchman_core`.
+use crate::routing::{all_browsers, route};
 use serde_json::json;
-use switchman_core::config::{self, Browser, Loaded};
+use switchman_core::config::{self, Loaded};
 use switchman_core::error::{LinkError, Result};
-use switchman_core::{detector, launcher, paths, registry, router};
+use switchman_core::{launcher, paths, registry};
 use tracing::{info, warn};
 
 /// URI de Configuración de Windows para elegir el navegador predeterminado.
 const SETTINGS_URI: &str = "ms-settings:defaultapps?registeredAppUser=Switchman";
-
-/// Navegadores disponibles: personalizados, rutas conocidas y registrados en Windows (sin duplicados).
-fn all_browsers(loaded: &Loaded) -> Vec<Browser> {
-    let custom = match loaded {
-        Loaded::Config(c) => c.custom_browsers.clone(),
-        Loaded::Fallback(b) => vec![b.clone()],
-    };
-    let env = |name: &str| std::env::var(name).ok();
-    let exists = |p: &std::path::Path| p.is_file();
-    let known = detector::detect_known(&env, &exists);
-    detector::merge(vec![custom, known, registry::installed_browsers()])
-}
 
 /// Config del usuario; si falta o está corrupta, una vacía (solo para listar navegadores).
 fn config_or_default() -> Result<Loaded> {
@@ -27,34 +16,6 @@ fn config_or_default() -> Result<Loaded> {
         Default::default()
     });
     Ok(Loaded::Config(config))
-}
-
-/// Decide navegador y URL; si falta la config usa el respaldo, y si falta este, el primer detectado.
-fn route(raw: &str) -> Result<router::Decision> {
-    let loaded =
-        config::load_effective(&paths::config_path()?, &paths::fallback_path()?).or_else(|e| {
-            warn!(error = %e, "sin config ni respaldo; uso el primer navegador detectado");
-            let first = all_browsers(&Loaded::Config(Default::default()))
-                .into_iter()
-                .next()
-                .ok_or(LinkError::BrowserNotFound("ninguno".into()))?;
-            Ok::<Loaded, LinkError>(Loaded::Fallback(first))
-        })?;
-
-    let browsers = all_browsers(&loaded);
-    let decision = match router::decide(&loaded, &browsers, raw) {
-        Err(LinkError::BrowserNotFound(id)) => {
-            warn!(%id, "navegador de la regla no encontrado; uso el respaldo");
-            let fallback = switchman_core::store::read_json::<Browser>(&paths::fallback_path()?)
-                .ok()
-                .or_else(|| browsers.first().cloned())
-                .ok_or(LinkError::BrowserNotFound(id))?;
-            router::decide(&Loaded::Fallback(fallback), &browsers, raw)?
-        }
-        other => other?,
-    };
-
-    Ok(decision)
 }
 
 /// Enruta y abre un enlace (lo invoca Windows en cada clic).

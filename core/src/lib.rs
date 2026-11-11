@@ -12,3 +12,5 @@ pub mod revision;
 pub mod router;
 pub mod sanitizer;
 pub mod store;
+#[cfg(windows)]
+pub mod webapps;

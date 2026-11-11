@@ -67,3 +67,19 @@ fn merge_dedupes_by_id_and_path_keeping_first() {
     let ids: Vec<&str> = merged.iter().map(|x| x.id.as_str()).collect();
     assert_eq!(ids, vec!["zen", "chrome"]);
 }
+
+#[test]
+fn merge_keeps_webapps_sharing_the_browser_exe() {
+    let app = |id: &str, app_id: &str| Browser {
+        id: id.into(),
+        name: id.into(),
+        exe_path: r"C:\Helium\chrome_proxy.exe".into(),
+        args: vec![format!("--app-id={app_id}")],
+    };
+    let merged = merge(vec![
+        vec![app("instagram-app", "aaa"), app("x-app", "bbb")],
+        vec![app("instagram-app", "aaa")],
+    ]);
+    let ids: Vec<&str> = merged.iter().map(|b| b.id.as_str()).collect();
+    assert_eq!(ids, ["instagram-app", "x-app"]);
+}

@@ -35,3 +35,28 @@ fn missing_exe_is_browser_not_found() {
     let r = launch(&browser(Path::new(r"Z:\nope\missing.exe")), &url(), &me);
     assert!(matches!(r, Err(LinkError::BrowserNotFound(_))));
 }
+
+#[test]
+fn url_is_appended_without_placeholder() {
+    let args = vec!["--new-window".to_string()];
+    assert_eq!(
+        launch_args(&args, "https://a.com/"),
+        ["--new-window", "https://a.com/"]
+    );
+    assert_eq!(launch_args(&[], "https://a.com/"), ["https://a.com/"]);
+}
+
+#[test]
+fn placeholder_is_replaced_inside_the_argument() {
+    let args = vec![
+        "--app-id=abc".to_string(),
+        "--app-launch-url-for-shortcuts-menu-item={url}".to_string(),
+    ];
+    assert_eq!(
+        launch_args(&args, "https://www.instagram.com/p/x/?a=1&b=2"),
+        [
+            "--app-id=abc",
+            "--app-launch-url-for-shortcuts-menu-item=https://www.instagram.com/p/x/?a=1&b=2"
+        ]
+    );
+}

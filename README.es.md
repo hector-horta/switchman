@@ -43,6 +43,9 @@ Sin acceso a la red, sin telemetría, sin cuentas. Tu configuración es un archi
 - **Respaldos seguros**: si `config.json` falta o está dañado, los enlaces se siguen abriendo en el
   navegador de respaldo que elegiste (o en el primero detectado). Una config rota nunca te deja sin
   navegador.
+- **Webapps instaladas como destino**: las apps instaladas desde un navegador Chromium (Helium, Chrome,
+  Edge, Brave → *Instalar app*) aparecen junto a los navegadores, p. ej. "Instagram (app de Helium)". Una
+  regla `instagram.com` → esa app abre el enlace **dentro de la ventana de la app**, no en una pestaña.
 - **Probar sin abrir**: muestra a qué navegador iría un enlace y cómo queda limpio.
 - **Ediciones a salvo**: si `config.json` cambia con la app abierta (a mano o desde otra ventana),
   la app pregunta si recargar o sobrescribir, en vez de descartar en silencio una de las versiones.
@@ -105,6 +108,18 @@ eliminarla. Después elige otro navegador predeterminado en la Configuración de
 | **Navegadores** | Navegador por defecto (enlaces sin regla) y de respaldo (si `config.json` falta o está dañado). |
 | **Probar enlace** | Pega un enlace y ve el navegador, la regla aplicada y el enlace limpio. No abre nada. |
 | **Ajustes** | Limpieza de rastreo, parámetros extra y el estado del navegador predeterminado de Windows. |
+
+### Abrir enlaces en webapps instaladas
+
+Instala el sitio como app desde tu navegador Chromium (*Instalar app* / *Instalar este sitio como
+aplicación*). Switchman la encuentra en el menú Inicio y la muestra en **Navegadores**, así que puedes
+elegirla en una regla: `instagram.com` → **Instagram (app de Helium)**. Cada enlace se abre en una
+ventana nueva de esa app.
+
+Por dentro, la app se lanza así:
+`chrome_proxy.exe --profile-directory=Default --app-id=<id> --app-launch-url-for-shortcuts-menu-item=<url>`.
+El mismo marcador `{url}` sirve en tus `custom_browsers`: si un argumento contiene `{url}`, el enlace va
+ahí; si no, se agrega al final.
 
 ### Archivos
 
