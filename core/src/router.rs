@@ -16,6 +16,8 @@ pub struct Decision {
     pub url: Url,
     pub rule_id: Option<String>,
     pub stripped: bool,
+    /// App de escritorio que abre el enlace por deep link (lo completa el CLI); si es `None`, el navegador.
+    pub app: Option<crate::deeplinks::AppTarget>,
 }
 
 /// Convierte una cadena de enlace en una URL válida con validaciones básicas.
@@ -70,6 +72,7 @@ pub fn decide(loaded: &Loaded, browsers: &[Browser], raw: &str) -> Result<Decisi
                 url,
                 rule_id: None,
                 stripped,
+                app: None,
             })
         }
         Loaded::Config(config) => {
@@ -85,6 +88,7 @@ pub fn decide(loaded: &Loaded, browsers: &[Browser], raw: &str) -> Result<Decisi
                 url,
                 rule_id,
                 stripped,
+                app: None,
             })
         }
     }

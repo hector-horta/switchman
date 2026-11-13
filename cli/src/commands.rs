@@ -3,7 +3,7 @@ use crate::routing::{all_browsers, route};
 use serde_json::json;
 use switchman_core::config::{self, Loaded};
 use switchman_core::error::{LinkError, Result};
-use switchman_core::{launcher, paths, registry};
+use switchman_core::{launcher, paths, protocols, registry};
 use tracing::{info, warn};
 
 /// URI de Configuración de Windows para elegir el navegador predeterminado.
@@ -21,6 +21,16 @@ fn config_or_default() -> Result<Loaded> {
 /// Enruta y abre un enlace (lo invoca Windows en cada clic).
 pub fn open_url(raw: &str) -> Result<()> {
     let decision = route(raw)?;
+    if let Some(app) = &decision.app {
+        match protocols::open_uri(&app.uri) {
+            Ok(()) => {
+                info!(app = %app.id, stripped = decision.stripped, "enlace abierto en la app");
+                return Ok(());
+            }
+            // Si la app no responde, el enlace igual se abre en el navegador.
+            Err(e) => warn!(app = %app.id, error = %e, "no se pudo abrir la app; uso el navegador"),
+        }
+    }
     let self_exe = std::env::current_exe()?;
     launcher::launch(&decision.browser, &decision.url, &self_exe)?;
     info!(browser = %decision.browser.id, rule = ?decision.rule_id, stripped = decision.stripped, "enlace abierto");
@@ -30,7 +40,16 @@ pub fn open_url(raw: &str) -> Result<()> {
 /// Prueba la ruta de un enlace y devuelve los detalles del navegador seleccionado como JSON.
 pub fn test_url(raw: &str) -> Result<()> {
     let decision = route(raw)?;
-    let out = json!({ "browser_id": decision.browser.id, "browser_name": decision.browser.name, "url": decision.url.as_str(), "rule_id": decision.rule_id, "stripped": decision.stripped });
+    let app = decision.app.as_ref();
+    let out = json!({
+        "browser_id": decision.browser.id,
+        "browser_name": decision.browser.name,
+        "url": decision.url.as_str(),
+        "rule_id": decision.rule_id,
+        "stripped": decision.stripped,
+        "app_name": app.map(|a| a.name.as_str()),
+        "app_uri": app.map(|a| a.uri.as_str()),
+    });
     println!("{out}");
     Ok(())
 }

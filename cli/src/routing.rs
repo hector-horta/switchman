@@ -2,7 +2,7 @@
 //! apunta a otro, con el registro de Windows y las webapps instaladas.
 use switchman_core::config::{self, Browser, Loaded};
 use switchman_core::error::{LinkError, Result};
-use switchman_core::{detector, paths, registry, router, webapps};
+use switchman_core::{deeplinks, detector, paths, protocols, registry, router, webapps};
 use tracing::warn;
 
 /// Destinos baratos de calcular: personalizados y rutas conocidas (sin leer registro ni accesos directos).
@@ -39,10 +39,14 @@ pub fn route(raw: &str) -> Result<router::Decision> {
 
     // Casi siempre basta con los destinos baratos. Si la regla apunta a otro (registro o webapp),
     // recién entonces se leen el registro y los accesos directos (~50 ms más por clic).
-    let decision = match router::decide(&loaded, &quick_browsers(&loaded), raw) {
+    let mut decision = match router::decide(&loaded, &quick_browsers(&loaded), raw) {
         Err(LinkError::BrowserNotFound(_)) => full_route(&loaded, raw)?,
         other => other?,
     };
+    // Sin regla que aplique: si el enlace es de una app activada e instalada, se abre en la app.
+    if let (None, Loaded::Config(config)) = (&decision.rule_id, &loaded) {
+        decision.app = deeplinks::target(config, &decision.url, &protocols::scheme_registered);
+    }
 
     Ok(decision)
 }

@@ -25,6 +25,8 @@ fn sample() -> Config {
         }],
         custom_browsers: vec![browser("zen")],
         extra_tracking_params: vec![],
+        app_links: vec![],
+        custom_deeplinks: vec![],
     }
 }
 

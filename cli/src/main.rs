@@ -1,5 +1,6 @@
 //! CLI de switchman: lo invoca Windows al abrir un enlace y la UI para configurar.
 #![cfg_attr(not(test), windows_subsystem = "windows")]
+mod apps_cmds;
 mod commands;
 mod config_cmds;
 mod routing;
@@ -8,7 +9,7 @@ use std::process::ExitCode;
 use switchman_core::error::LinkError;
 use tracing::error;
 
-const USAGE: &str = "uso: switchman-cli <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | register | unregister>";
+const USAGE: &str = "uso: switchman-cli <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | apps | register | unregister>";
 
 /// Despacha el subcomando y devuelve 0 (ok), 1 (error) o 2 (uso incorrecto).
 fn main() -> ExitCode {
@@ -27,6 +28,7 @@ fn main() -> ExitCode {
         ("get-config", []) => config_cmds::get_config(),
         ("reset-config", []) => config_cmds::reset_config(),
         ("status", []) => config_cmds::status(),
+        ("apps", []) => apps_cmds::apps(),
         ("detect", []) => commands::detect(),
         ("register", []) => commands::register(),
         ("unregister", []) => commands::unregister(),

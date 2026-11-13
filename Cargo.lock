@@ -640,11 +640,13 @@ name = "switchman-core"
 version = "0.2.1"
 dependencies = [
  "lnk",
+ "percent-encoding",
  "serde",
  "serde_json",
  "thiserror 2.0.21",
  "tracing",
  "url",
+ "windows-sys",
  "winreg",
 ]
 

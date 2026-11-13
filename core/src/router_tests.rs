@@ -33,6 +33,8 @@ fn cfg() -> Loaded {
         ],
         custom_browsers: vec![],
         extra_tracking_params: vec!["ref".into()],
+        app_links: vec![],
+        custom_deeplinks: vec![],
     })
 }
 

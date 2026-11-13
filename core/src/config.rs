@@ -29,7 +29,7 @@ const MAX_ID_LEN: usize = 64;
 
 /// Verifica que el ID cumple los requisitos: no vacío, longitud ≤ 64 caracteres,
 /// y solo contiene letras numéricas ASCII o guiones bajos, puntos o guiones.
-fn check_id(kind: &str, id: &str) -> Result<()> {
+pub(crate) fn check_id(kind: &str, id: &str) -> Result<()> {
     let ok = !id.is_empty()
         && id.len() <= MAX_ID_LEN
         && id
@@ -57,7 +57,7 @@ pub fn validate(config: &Config) -> Result<()> {
             return Err(LinkError::Config(format!("ruta vacía para {}", b.id)));
         }
     }
-    Ok(())
+    crate::deeplinks::validate(config)
 }
 
 /// Carga y valida la configuración desde un archivo JSON en el path proporcionado.
