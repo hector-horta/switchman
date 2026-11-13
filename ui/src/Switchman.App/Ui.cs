@@ -1,5 +1,7 @@
-using Switchman.Core.Models;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Switchman.Core.Models;
+using Switchman.Core.ViewModels;
 
 namespace Switchman.App;
 
@@ -7,6 +9,18 @@ namespace Switchman.App;
 internal static class Ui
 {
     public static bool HasText(string? text) => !string.IsNullOrWhiteSpace(text);
+
+    /// <summary>Colapsa el InfoBar sin mensaje: cerrado igual ocupa el espaciado de su panel.</summary>
+    public static Visibility VisibleIfText(string? text) => HasText(text) ? Visibility.Visible : Visibility.Collapsed;
+
+    /// <summary>Severidad del InfoBar según el tipo de mensaje del ViewModel (Core no conoce WinUI).</summary>
+    public static InfoBarSeverity SeverityOf(MessageKind kind) => kind switch
+    {
+        MessageKind.Success => InfoBarSeverity.Success,
+        MessageKind.Warning => InfoBarSeverity.Warning,
+        MessageKind.Error => InfoBarSeverity.Error,
+        _ => InfoBarSeverity.Informational,
+    };
 
     /// <summary>Visible si hay valor. Devuelve Visibility: la conversión implícita bool→Visibility
     /// sobre el resultado de una función genera código inválido en el compilador de XAML.</summary>

@@ -8,7 +8,7 @@ using Switchman.Core.Services;
 namespace Switchman.Core.ViewModels;
 
 /// <summary>Página Navegadores: navegador por defecto (config.json) y de respaldo (fallback.json).</summary>
-public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient cli) : ObservableObject
+public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient cli) : PageViewModel
 {
     private readonly ConfigSession _session = session;
     private readonly ICliClient _cli = cli;
@@ -24,8 +24,6 @@ public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient 
     [ObservableProperty]
     public partial string? FallbackBrowserId { get; set; } = "";
 
-    [ObservableProperty]
-    public partial string Message { get; set; } = "";
 
     /// <summary>Guarda el navegador por defecto y, si cambió, el de respaldo.</summary>
     [RelayCommand]
@@ -33,7 +31,7 @@ public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient 
     {
         var config = (_session.Current?.Config ?? LinkConfig.Empty) with { DefaultBrowserId = DefaultBrowserId ?? "" };
         var outcome = await _session.SaveAsync(config, ct).ConfigureAwait(true);
-        Message = outcome.Message;
+        ShowOutcome(outcome);
         if (outcome.Status == SaveStatus.Reloaded)
         {
             DefaultBrowserId = _session.Current?.Config.DefaultBrowserId ?? "";
@@ -49,7 +47,7 @@ public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient 
         }
         else
         {
-            Message = fallback.Error;
+            Show(MessageKind.Error, fallback.Error);
         }
     }
 
@@ -62,10 +60,10 @@ public sealed partial class BrowsersViewModel(ConfigSession session, ICliClient 
         var browsers = await _cli.DetectAsync(ct).ConfigureAwait(true);
         Browsers.Clear();
         if (browsers.IsOk) { foreach (var browser in browsers.Value!) { Browsers.Add(browser); } }
-        else { Message = browsers.Error; }
+        else { Show(MessageKind.Error, browsers.Error); }
 
         var config = await _session.LoadAsync(ct).ConfigureAwait(true);
-        if (!config.IsOk) { Message = config.Error; }
+        if (!config.IsOk) { Show(MessageKind.Error, config.Error); }
         var defaultId = config.Value?.Config.DefaultBrowserId ?? "";
         if (defaultId.Length == 0 && Browsers.Count > 0)
         {

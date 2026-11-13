@@ -6,7 +6,7 @@ using Switchman.Core.Models;
 namespace Switchman.Core.ViewModels;
 
 /// <summary>Página Probar enlace: qué navegador y qué URL limpia resultarían, sin abrir nada.</summary>
-public sealed partial class TestLinkViewModel(ICliClient cli) : ObservableObject
+public sealed partial class TestLinkViewModel(ICliClient cli) : PageViewModel
 {
     private readonly ICliClient _cli = cli;
 
@@ -17,8 +17,6 @@ public sealed partial class TestLinkViewModel(ICliClient cli) : ObservableObject
     [ObservableProperty]
     public partial RouteResult? Result { get; set; }
 
-    [ObservableProperty]
-    public partial string Message { get; set; } = "";
 
     private bool CanTest() => !string.IsNullOrWhiteSpace(Url);
 
@@ -28,6 +26,6 @@ public sealed partial class TestLinkViewModel(ICliClient cli) : ObservableObject
     {
         var response = await _cli.TestUrlAsync(Url.Trim(), ct).ConfigureAwait(true);
         Result = response.IsOk ? response.Value : null;
-        Message = response.IsOk ? "" : response.Error;
+        Show(MessageKind.Error, response.IsOk ? "" : response.Error);
     }
 }

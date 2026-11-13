@@ -7,7 +7,7 @@ using Switchman.Core.Services;
 namespace Switchman.Core.ViewModels;
 
 /// <summary>Página Ajustes: limpieza de rastreo, parámetros extra y registro en Windows.</summary>
-public sealed partial class SettingsViewModel(ConfigSession session, ICliClient cli) : ObservableObject
+public sealed partial class SettingsViewModel(ConfigSession session, ICliClient cli) : PageViewModel
 {
     private readonly ConfigSession _session = session;
     private readonly ICliClient _cli = cli;
@@ -24,8 +24,6 @@ public sealed partial class SettingsViewModel(ConfigSession session, ICliClient 
     [NotifyPropertyChangedFor(nameof(IsDefault))]
     public partial AppStatus? Status { get; set; }
 
-    [ObservableProperty]
-    public partial string Message { get; set; } = "";
 
     /// <summary>Switchman es el navegador predeterminado para http y https.</summary>
     public bool IsDefault => Status?.Registry is { DefaultHttp: true, DefaultHttps: true };
@@ -53,16 +51,16 @@ public sealed partial class SettingsViewModel(ConfigSession session, ICliClient 
         Status = status.Value;
         if (!status.IsOk)
         {
-            Message = status.Error;
+            Show(MessageKind.Error, status.Error);
         }
     }
 
     private async Task ChangeRegistrationAsync(bool register, CancellationToken ct)
     {
         var response = register ? await _cli.RegisterAsync(ct).ConfigureAwait(true) : await _cli.UnregisterAsync(ct).ConfigureAwait(true);
-        if (!response.IsOk) { Message = response.Error; }
-        else if (register) { Message = "Registrado. En la Configuración de Windows que se abrió, busca Switchman y pulsa «Establecer como predeterminado»"; }
-        else { Message = "Switchman ya no está registrado como navegador"; }
+        if (!response.IsOk) { Show(MessageKind.Error, response.Error); }
+        else if (register) { Show(MessageKind.Success, "Registrado. En la Configuración de Windows que se abrió, busca Switchman y pulsa «Establecer como predeterminado»"); }
+        else { Show(MessageKind.Info, "Switchman ya no está registrado como navegador"); }
         await RefreshStatusAsync(ct).ConfigureAwait(true);
     }
 
@@ -72,7 +70,7 @@ public sealed partial class SettingsViewModel(ConfigSession session, ICliClient 
     {
         var config = (_session.Current?.Config ?? LinkConfig.Empty) with { StripTracking = StripTracking, ExtraTrackingParams = ParseParams(ExtraParams) };
         var outcome = await _session.SaveAsync(config, ct).ConfigureAwait(true);
-        Message = outcome.Message;
+        ShowOutcome(outcome);
         if (outcome.Status is SaveStatus.Saved or SaveStatus.Reloaded)
         {
             ShowConfig();
@@ -84,7 +82,7 @@ public sealed partial class SettingsViewModel(ConfigSession session, ICliClient 
     private async Task LoadAsync(CancellationToken ct)
     {
         var response = await _session.LoadAsync(ct).ConfigureAwait(true);
-        if (!response.IsOk) { Message = response.Error; }
+        if (!response.IsOk) { Show(MessageKind.Error, response.Error); }
         ShowConfig();
         await RefreshStatusAsync(ct).ConfigureAwait(true);
     }
@@ -92,6 +90,6 @@ public sealed partial class SettingsViewModel(ConfigSession session, ICliClient 
     /// <summary>Texto libre → lista de parámetros sin vacíos ni duplicados.</summary>
     public static IReadOnlyList<string> ParseParams(string text)
     {
-        return text.Split(ParamSeparators,StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        return text.Split(ParamSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
     }
 }

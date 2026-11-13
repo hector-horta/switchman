@@ -8,7 +8,7 @@ using Switchman.Core.Services;
 namespace Switchman.Core.ViewModels;
 
 /// <summary>Página Reglas: lista editable de dominio/ruta → navegador.</summary>
-public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli) : ObservableObject
+public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli) : PageViewModel
 {
     private readonly ConfigSession _session = session;
     private readonly ICliClient _cli = cli;
@@ -24,9 +24,6 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
 
     public bool HasSelection => SelectedRule is not null;
 
-    /// <summary>Resultado de la última acción, para el InfoBar.</summary>
-    [ObservableProperty]
-    public partial string Message { get; set; } = "";
 
     /// <summary>Copia las reglas de la sesión a la lista editable.</summary>
     private void FillRules()
@@ -67,7 +64,7 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
             note = $" · navegador por defecto: {Browsers[0].Name} (cámbialo en Navegadores)";
         }
         var outcome = await _session.SaveAsync(config, ct).ConfigureAwait(true);
-        Message = outcome.Status == SaveStatus.Saved ? outcome.Message + note : outcome.Message;
+        ShowOutcome(outcome, note);
         if (outcome.Status == SaveStatus.Reloaded)
         {
             FillRules();
@@ -119,13 +116,13 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
         }
         else
         {
-            Message = browsers.Error;
+            Show(MessageKind.Error, browsers.Error);
         }
 
         var config = await _session.LoadAsync(ct).ConfigureAwait(true);
         if (!config.IsOk)
         {
-            Message = config.Error;
+            Show(MessageKind.Error, config.Error);
         }
         FillRules();
     }

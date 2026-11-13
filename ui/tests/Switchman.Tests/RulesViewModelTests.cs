@@ -75,8 +75,17 @@ public sealed class RulesViewModelTests
         Assert.Equal("gitlab.com", saved.Pattern);
         Assert.Equal("edge", _cli.LastSaved.DefaultBrowserId);
         Assert.Equal("Guardado", vm.Message);
+        Assert.Equal(MessageKind.Success, vm.MessageKind);
         Assert.Contains("set-config:rev1", _cli.Calls);
     }
+
+    [Theory]
+    [InlineData(SaveStatus.Saved, MessageKind.Success)]
+    [InlineData(SaveStatus.Reloaded, MessageKind.Warning)]
+    [InlineData(SaveStatus.Cancelled, MessageKind.Info)]
+    [InlineData(SaveStatus.Failed, MessageKind.Error)]
+    public void SaveStatusMapsToInfoBarSeverity(SaveStatus status, MessageKind expected) =>
+        Assert.Equal(expected, PageViewModel.KindOf(status));
 
     [Fact]
     public async Task FailedSaveShowsCliError()
@@ -88,6 +97,7 @@ public sealed class RulesViewModelTests
         await vm.SaveCommand.ExecuteAsync(null);
 
         Assert.Equal("patrón inválido: x", vm.Message);
+        Assert.Equal(MessageKind.Error, vm.MessageKind);
     }
 
     [Fact]
