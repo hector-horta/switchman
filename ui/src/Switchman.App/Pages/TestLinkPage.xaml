@@ -44,10 +44,11 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="0" Grid.Row="0" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Navegador" />
+                    <TextBlock Grid.Column="0" Grid.Row="0" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Se abre en" />
                     <TextBlock Grid.Column="1" Grid.Row="0" IsTextSelectionEnabled="True"
-                               TextWrapping="Wrap" Text="{x:Bind ViewModel.Result.BrowserName}" />
+                               TextWrapping="Wrap" Text="{x:Bind app:Ui.OpenedWith(ViewModel.Result)}" />
 
                     <TextBlock Grid.Column="0" Grid.Row="1" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Regla aplicada" />
                     <TextBlock Grid.Column="1" Grid.Row="1" IsTextSelectionEnabled="True"
@@ -60,6 +61,9 @@
                     <TextBlock Grid.Column="0" Grid.Row="3" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Se quitaron parámetros" />
                     <TextBlock Grid.Column="1" Grid.Row="3" IsTextSelectionEnabled="True"
                                TextWrapping="Wrap" Text="{x:Bind app:Ui.YesNo(ViewModel.Result.Stripped)}" />
+                    <TextBlock Grid.Column="0" Grid.Row="4" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Deep link" />
+                    <TextBlock Grid.Column="1" Grid.Row="4" IsTextSelectionEnabled="True"
+                               TextWrapping="Wrap" Text="{x:Bind app:Ui.DeepLinkText(ViewModel.Result)}" />
                 </Grid>
             </Border>
         </StackPanel>

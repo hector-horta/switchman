@@ -79,6 +79,9 @@ public sealed partial class MainWindow : Window
                 case "browsers":
                     NavFrame.Navigate(typeof(BrowsersPage));
                     break;
+                case "apps":
+                    NavFrame.Navigate(typeof(AppsPage));
+                    break;
                 case "test":
                     NavFrame.Navigate(typeof(TestLinkPage));
                     break;

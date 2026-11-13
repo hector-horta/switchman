@@ -24,6 +24,8 @@ internal sealed class FakeCli : ICliClient
 
     public CliResponse<string> CommandReply { get; set; } = Ok("");
 
+    public CliResponse<AppsInfo> AppsReply { get; set; } = Fail<AppsInfo>(CliExit.Error, "sin respuesta");
+
     public List<string> Calls { get; } = [];
 
     public LinkConfig? LastSaved { get; private set; }
@@ -57,6 +59,12 @@ internal sealed class FakeCli : ICliClient
     {
         Calls.Add($"test-url:{url}");
         return Task.FromResult(TestUrlReply);
+    }
+
+    public Task<CliResponse<AppsInfo>> AppsAsync(CancellationToken ct)
+    {
+        Calls.Add("apps");
+        return Task.FromResult(AppsReply);
     }
 
     public Task<CliResponse<AppStatus>> StatusAsync(CancellationToken ct)

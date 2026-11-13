@@ -47,6 +47,11 @@
                         <FontIcon Glyph="&#xE774;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Apps" Tag="apps">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE71D;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Probar enlace" Tag="test">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE71B;" />

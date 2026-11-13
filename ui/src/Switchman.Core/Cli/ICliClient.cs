@@ -11,6 +11,7 @@ public interface ICliClient
     Task<CliResponse<IReadOnlyList<Browser>>> DetectAsync(CancellationToken ct);
     Task<CliResponse<RouteResult>> TestUrlAsync(string url, CancellationToken ct);
     Task<CliResponse<AppStatus>> StatusAsync(CancellationToken ct);
+    Task<CliResponse<AppsInfo>> AppsAsync(CancellationToken ct);
     Task<CliResponse<string>> SetFallbackAsync(string browserId, CancellationToken ct);
     Task<CliResponse<string>> RegisterAsync(CancellationToken ct);
     Task<CliResponse<string>> UnregisterAsync(CancellationToken ct);

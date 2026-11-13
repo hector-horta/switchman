@@ -1,0 +1,128 @@
+<Page x:Class="Switchman.App.Pages.AppsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:app="using:Switchman.App"
+      xmlns:vm="using:Switchman.Core.ViewModels"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      x:DefaultBindMode="OneWay">
+
+    <ScrollViewer>
+        <StackPanel Padding="36,24,36,36" Spacing="4">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Apps" />
+            <TextBlock Margin="0,0,0,16" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                      TextWrapping="Wrap"
+                      Text="Abre los enlaces de estas apps en su aplicación de escritorio en vez del navegador. Tus reglas tienen prioridad." />
+
+            <InfoBar Margin="0,0,0,8" Visibility="{x:Bind app:Ui.VisibleIfText(ViewModel.Message)}"
+                     IsClosable="False" IsOpen="{x:Bind app:Ui.HasText(ViewModel.Message)}"
+                     Severity="{x:Bind app:Ui.SeverityOf(ViewModel.MessageKind)}"
+                     Message="{x:Bind ViewModel.Message}" />
+
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           Text="Apps detectadas" />
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Button Content="Buscar apps" Command="{x:Bind ViewModel.LoadCommand}" />
+                    <Button Content="Guardar" Style="{StaticResource AccentButtonStyle}"
+                            Command="{x:Bind ViewModel.SaveCommand}" />
+                </StackPanel>
+            </Grid>
+
+            <ItemsControl ItemsSource="{x:Bind ViewModel.Apps}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="4" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:AppToggle">
+                        <controls:SettingsCard Header="{x:Bind Name, Mode=OneTime}"
+                                             Description="{x:Bind Domains, Mode=OneTime}">
+                            <controls:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE8A7;" />
+                            </controls:SettingsCard.HeaderIcon>
+                            <ToggleSwitch IsOn="{x:Bind Enabled, Mode=TwoWay}" />
+                        </controls:SettingsCard>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextBlockStyle}"
+                      Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                      Text="{x:Bind ViewModel.NotInstalled}" />
+
+            <TextBlock Margin="0,32,0,4" Style="{StaticResource SubtitleTextBlockStyle}"
+                      Text="Deep links propios" />
+
+            <TextBlock Margin="0,0,0,8" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                      TextWrapping="Wrap"
+                      Text="Para apps que el catálogo no conoce: los enlaces de esos dominios se abren con la plantilla. Marcadores: {url} {host} {path} {query}." />
+
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="{ThemeResource OverlayCornerRadius}" Padding="4" MinHeight="160">
+                    <ListView ItemsSource="{x:Bind ViewModel.CustomLinks}"
+                              SelectedItem="{x:Bind ViewModel.SelectedLink, Mode=TwoWay}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DeepLinkItem">
+                                <StackPanel Padding="0,6">
+                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                                               Text="{x:Bind Title}" />
+                                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               Text="{x:Bind Scheme}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+
+                <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="{ThemeResource OverlayCornerRadius}" Padding="16" VerticalAlignment="Top"
+                        Visibility="{x:Bind ViewModel.HasSelection}">
+                    <StackPanel Spacing="12">
+                        <TextBox Header="Nombre" Text="{x:Bind ViewModel.SelectedLink.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Header="Protocolo (p. ej. steam)" Text="{x:Bind ViewModel.SelectedLink.Scheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Header="Dominios (uno por línea)"
+                                 AcceptsReturn="True" MinHeight="72"
+                                 Text="{x:Bind ViewModel.SelectedLink.DomainsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Header="Plantilla (p. ej. steam://openurl/{url})"
+                                 Text="{x:Bind ViewModel.SelectedLink.Template, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Content="Quitar deep link" Command="{x:Bind ViewModel.RemoveLinkCommand}"
+                                CommandParameter="{x:Bind ViewModel.SelectedLink}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Button Margin="0,8,0,0" Content="Nuevo deep link"
+                    Command="{x:Bind ViewModel.AddLinkCommand}" />
+
+            <controls:SettingsExpander Margin="0,24,0,0" Header="Otros protocolos instalados"
+                                       Description="Apps que registraron un protocolo y el catálogo no conoce. Elige uno para crear su deep link.">
+                <controls:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE71D;" />
+                </controls:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander.Items>
+                    <controls:SettingsCard ContentAlignment="Vertical" HorizontalContentAlignment="Stretch">
+                        <StackPanel Spacing="8">
+                            <ListView MaxHeight="200" ItemsSource="{x:Bind ViewModel.OtherSchemes}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedScheme, Mode=TwoWay}" />
+                            <Button Content="Crear deep link con este protocolo" Command="{x:Bind ViewModel.UseSchemeCommand}" />
+                        </StackPanel>
+                    </controls:SettingsCard>
+                </controls:SettingsExpander.Items>
+            </controls:SettingsExpander>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

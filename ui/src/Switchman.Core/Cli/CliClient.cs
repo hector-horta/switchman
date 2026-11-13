@@ -28,6 +28,9 @@ public sealed class CliClient(IProcessRunner runner) : ICliClient
     public Task<CliResponse<AppStatus>> StatusAsync(CancellationToken ct) =>
         CallAsync(["status"], null, Json.AppStatus, ct);
 
+    public Task<CliResponse<AppsInfo>> AppsAsync(CancellationToken ct) =>
+        CallAsync(["apps"], null, Json.AppsInfo, ct);
+
     public Task<CliResponse<string>> SetFallbackAsync(string browserId, CancellationToken ct) =>
         RunAsync(["set-fallback", browserId], ct);
 

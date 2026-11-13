@@ -28,9 +28,18 @@ internal static class Ui
 
     /// <summary>Recibe el resultado entero: x:Bind no llama a la función si el argumento es null.</summary>
     public static string RuleText(RouteResult? result) =>
-        result?.RuleId is { Length: > 0 } id ? id : "ninguna (navegador por defecto)";
+        result?.RuleId is { Length: > 0 } id ? id
+        : result?.AppName is { Length: > 0 } ? "ninguna (deep link de la app)"
+        : "ninguna (navegador por defecto)";
 
     public static string YesNo(bool value) => value ? "Sí" : "No";
+
+    /// <summary>Dónde se abre: la app del deep link si hay una, si no el navegador.</summary>
+    public static string OpenedWith(RouteResult? result) =>
+        result?.AppName is { Length: > 0 } app ? app + " (app)" : result?.BrowserName ?? "";
+
+    public static string DeepLinkText(RouteResult? result) =>
+        result?.AppUri is { Length: > 0 } uri ? uri : "ninguno (se abre en el navegador)";
 
     public static string DefaultState(bool isDefault) => isDefault
         ? "Switchman es el navegador predeterminado: los enlaces pasan por tus reglas."

@@ -46,6 +46,9 @@ Sin acceso a la red, sin telemetría, sin cuentas. Tu configuración es un archi
 - **Webapps instaladas como destino**: las apps instaladas desde un navegador Chromium (Helium, Chrome,
   Edge, Brave → *Instalar app*) aparecen junto a los navegadores, p. ej. "Instagram (app de Helium)". Una
   regla `instagram.com` → esa app abre el enlace **dentro de la ventana de la app**, no en una pestaña.
+- **Apps de escritorio por deep link**: los enlaces de WhatsApp, Discord, Teams, Telegram, Zoom, Slack, Spotify o
+  Notion se abren en su app de escritorio (un interruptor por app), y puedes agregar deep links para cualquier
+  otra app que registre un protocolo.
 - **Probar sin abrir**: muestra a qué navegador iría un enlace y cómo queda limpio.
 - **Ediciones a salvo**: si `config.json` cambia con la app abierta (a mano o desde otra ventana),
   la app pregunta si recargar o sobrescribir, en vez de descartar en silencio una de las versiones.
@@ -121,6 +124,30 @@ Por dentro, la app se lanza así:
 El mismo marcador `{url}` sirve en tus `custom_browsers`: si un argumento contiene `{url}`, el enlace va
 ahí; si no, se agrega al final.
 
+### Abrir enlaces en apps de escritorio (deep links)
+
+Muchas apps (WhatsApp de la Microsoft Store, apps de Electron como Discord, Teams…) registran un protocolo
+propio (`whatsapp:`, `discord:`…). En la página **Apps** cada app instalada del catálogo integrado tiene un
+interruptor; activado, sus enlaces web se traducen y se abren en la app:
+
+| Enlace web | Se abre como |
+| --- | --- |
+| `wa.me/<número>?text=…`, `api.whatsapp.com/send?phone=…` | `whatsapp://send?phone=…&text=…` |
+| `chat.whatsapp.com/<código>` | `whatsapp://chat?code=<código>` |
+| `discord.gg/<código>`, `discord.com/channels/…` | `discord://-/invite/<código>`, `discord://-/channels/…` |
+| `teams.microsoft.com/l/…` | `msteams:/l/…` |
+| `t.me/<usuario>`, `t.me/+<invitación>` | `tg://resolve?domain=<usuario>`, `tg://join?invite=<invitación>` |
+| `zoom.us/j/<id>?pwd=…` | `zoommtg://zoom.us/join?action=join&confno=<id>&pwd=…` |
+| `app.slack.com/client/<equipo>/<canal>` | `slack://channel?team=…&id=…` |
+| `open.spotify.com/<tipo>/<id>` | `spotify:<tipo>:<id>` |
+| `notion.so/…` | `notion://www.notion.so/…` |
+
+Tus reglas van primero, los parámetros de rastreo se quitan antes de traducir, y un enlace sin forma de app
+(por ejemplo `wa.me/message/…`) se abre en el navegador como siempre. **Buscar apps** vuelve a revisar el
+sistema: las apps del catálogo recién instaladas aparecen con su interruptor, y los demás protocolos
+instalados se listan para que crees tu propio deep link: dominios + una plantilla como
+`steam://openurl/{url}` (marcadores `{url}`, `{host}`, `{path}`, `{query}`).
+
 ### Archivos
 
 Todo vive en `%LOCALAPPDATA%\Switchman`:
@@ -145,6 +172,7 @@ switchman-cli set-config --revision R   guarda la config de stdin si nadie la ca
 switchman-cli reset-config              aparta un config.json dañado como config.json.bak
 switchman-cli set-fallback <ID>         fija el navegador de respaldo
 switchman-cli status                    estado del registro y del navegador predeterminado
+switchman-cli apps                      catálogo de deep links, deep links propios y otros protocolos instalados
 switchman-cli register | unregister     registra en Windows o quita el registro (HKCU)
 ```
 

@@ -70,4 +70,28 @@ public sealed class CliClientTests
         Assert.Null(r.Value!.RuleId);
         Assert.True(r.Value.Stripped);
     }
+
+    [Fact]
+    public async Task AppsParsesCatalogCustomAndOtherSchemes()
+    {
+        var runner = new FakeRunner(new CliResult(CliExit.Ok, """{"catalog":[{"id":"whatsapp","name":"WhatsApp","scheme":"whatsapp","domains":["wa.me"],"installed":true,"enabled":false}],"custom":[{"id":"steam","name":"Steam","scheme":"steam","domains":["store.steampowered.com"],"template":"steam://openurl/{url}","installed":true}],"other_schemes":["bitwarden"]}""", ""));
+        var r = await Client(runner).AppsAsync(CancellationToken.None);
+        Assert.True(r.Value!.Catalog[0].Installed);
+        Assert.Equal("steam://openurl/{url}", r.Value.Custom[0].Template);
+        Assert.Equal(["bitwarden"], r.Value.OtherSchemes);
+        Assert.Equal(["apps"], runner.LastArgs);
+    }
+
+    [Fact]
+    public async Task ConfigWithoutDeepLinksDoesNotSendNulls()
+    {
+        var runner = new FakeRunner(new CliResult(CliExit.Ok, """{"revision":"r"}""", ""));
+        await Client(runner).SetConfigAsync(new LinkConfig("edge", true, [], [], []), "none", CancellationToken.None);
+        Assert.DoesNotContain("null", runner.LastStdin, StringComparison.Ordinal);
+        await Client(runner).SetConfigAsync(new LinkConfig("edge", true, [], [], [], ["whatsapp"], []), "none", CancellationToken.None);
+        Assert.Contains("\"app_links\":[\"whatsapp\"]", runner.LastStdin, StringComparison.Ordinal);
+        // Los nombres deben ser los de serde en Rust (config_types.rs), no los de la convención de C#.
+        await Client(runner).SetConfigAsync(new LinkConfig("edge", true, [], [], [], [], [new CustomDeepLink("dl1", "Steam", "steam", ["a.com"], "steam://{url}")]), "none", CancellationToken.None);
+        Assert.Contains("\"custom_deeplinks\":[{\"id\":\"dl1\"", runner.LastStdin, StringComparison.Ordinal);
+    }
 }
