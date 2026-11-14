@@ -127,3 +127,12 @@ fn local_files_are_recognized() {
     assert!(!is_local_file("page.html"));
     assert!(!is_local_file(""));
 }
+
+#[test]
+fn bare_links_and_files_are_accepted_without_subcommand() {
+    assert!(is_link_or_file("https://wa.me/1"));
+    assert!(is_link_or_file("HTTP://a.com"));
+    assert!(is_link_or_file("file:///C:/a.html"));
+    assert!(!is_link_or_file("status"));
+    assert!(!is_link_or_file("mailto:a@b.com"));
+}

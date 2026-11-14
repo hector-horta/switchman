@@ -63,6 +63,9 @@ fn whatsapp_links() {
         s("whatsapp://")
     );
     assert_eq!(tr("whatsapp", "https://www.whatsapp.com/download"), None);
+    // Portada: lo que abre Phone Link al tocar una notificación de WhatsApp.
+    assert_eq!(tr("whatsapp", "http://www.whatsapp.com/"), s("whatsapp://"));
+    assert_eq!(tr("whatsapp", "https://whatsapp.com"), s("whatsapp://"));
 }
 
 #[test]

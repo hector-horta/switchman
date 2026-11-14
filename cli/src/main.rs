@@ -7,6 +7,7 @@ mod routing;
 
 use std::process::ExitCode;
 use switchman_core::error::LinkError;
+use switchman_core::router;
 use tracing::error;
 
 const USAGE: &str = "uso: switchman-cli <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | apps | register | unregister>";
@@ -16,7 +17,9 @@ fn main() -> ExitCode {
     init_logging();
     let args: Vec<String> = std::env::args().skip(1).collect();
     let cmd = args.first().map(String::as_str).unwrap_or("");
-    if cmd != "open-url" {
+    // Sin consola al abrir enlaces: con `open-url` o con el enlace/archivo solo como único argumento.
+    let opens_link = cmd == "open-url" || (args.len() == 1 && router::is_link_or_file(cmd));
+    if !opens_link {
         attach_console();
     }
     let rest: Vec<&str> = args.iter().skip(1).map(String::as_str).collect();
@@ -32,6 +35,7 @@ fn main() -> ExitCode {
         ("detect", []) => commands::detect(),
         ("register", []) => commands::register(),
         ("unregister", []) => commands::unregister(),
+        (link, []) if router::is_link_or_file(link) => commands::open_url(link),
         _ => {
             eprintln!("{USAGE}");
             return ExitCode::from(2);

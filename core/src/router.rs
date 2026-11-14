@@ -48,6 +48,18 @@ pub fn is_local_file(raw: &str) -> bool {
         || std::path::Path::new(raw).is_absolute()
 }
 
+/// Argumento único que es un enlace http(s) o un archivo local: así llaman a Switchman las apps que
+/// lanzan "el navegador" con la URL sola, o la asociación genérica `Applications\switchman-cli.exe`
+/// que crea Windows si se elige el .exe a mano (`switchman-cli.exe "%1"`, sin `open-url`).
+pub fn is_link_or_file(raw: &str) -> bool {
+    let raw = raw.trim();
+    let starts = |p: &str| {
+        raw.get(..p.len())
+            .is_some_and(|h| h.eq_ignore_ascii_case(p))
+    };
+    starts("http://") || starts("https://") || is_local_file(raw)
+}
+
 /// Elige el navegador y la regla de redirección que mejor se ajuste al enlace proporcionado,
 /// priorizando patrones válidos en la configuración del usuario.
 fn pick(config: &Config, url: &Url) -> (String, Option<String>, bool) {
