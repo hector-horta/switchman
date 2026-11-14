@@ -28,10 +28,12 @@ pub fn open_url(raw: &str) -> Result<()> {
         return Ok(());
     }
     let decision = route(raw)?;
+    // Solo el dominio, nunca la URL completa: alcanza para saber qué enlaces llegan (p. ej. de Phone Link).
+    let host = decision.url.host_str().unwrap_or("");
     if let Some(app) = &decision.app {
         match protocols::open_uri(&app.uri) {
             Ok(()) => {
-                info!(app = %app.id, stripped = decision.stripped, "enlace abierto en la app");
+                info!(%host, app = %app.id, stripped = decision.stripped, "enlace abierto en la app");
                 return Ok(());
             }
             // Si la app no responde, el enlace igual se abre en el navegador.
@@ -40,7 +42,7 @@ pub fn open_url(raw: &str) -> Result<()> {
     }
     let self_exe = std::env::current_exe()?;
     launcher::launch(&decision.browser, &decision.url, &self_exe)?;
-    info!(browser = %decision.browser.id, rule = ?decision.rule_id, stripped = decision.stripped, "enlace abierto");
+    info!(%host, browser = %decision.browser.id, rule = ?decision.rule_id, stripped = decision.stripped, "enlace abierto");
     Ok(())
 }
 

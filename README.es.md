@@ -156,7 +156,7 @@ Todo vive en `%LOCALAPPDATA%\Switchman`:
 | --- | --- |
 | `config.json` | Reglas, navegador por defecto, opciones de limpieza y navegadores personalizados. |
 | `fallback.json` | Navegador a usar si `config.json` no se puede leer. |
-| `switchman.log` | Una línea por enlace abierto (navegador, regla, si se limpió; nunca la URL). |
+| `switchman.log` | Una línea por enlace abierto: dominio, navegador o app, regla y si se limpió (nunca la URL completa). |
 | `switchman-ui.log` | Eventos y errores de la app. |
 
 ### Línea de comandos
