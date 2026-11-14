@@ -25,17 +25,40 @@ pub fn all_browsers(loaded: &Loaded) -> Vec<Browser> {
     ])
 }
 
-/// Decide navegador y URL; si falta la config usa el respaldo, y si falta este, el primer detectado.
+/// Config efectiva; si falta la config usa el respaldo, y si falta este, el primer detectado.
+fn effective() -> Result<Loaded> {
+    config::load_effective(&paths::config_path()?, &paths::fallback_path()?).or_else(|e| {
+        warn!(error = %e, "sin config ni respaldo; uso el primer navegador detectado");
+        let first = all_browsers(&Loaded::Config(Default::default()))
+            .into_iter()
+            .next()
+            .ok_or(LinkError::BrowserNotFound("ninguno".into()))?;
+        Ok(Loaded::Fallback(first))
+    })
+}
+
+/// Navegador por defecto efectivo, para archivos locales (no pasan por reglas ni limpieza).
+pub fn default_browser() -> Result<Browser> {
+    let config = match effective()? {
+        Loaded::Fallback(browser) => return Ok(browser),
+        Loaded::Config(config) => config,
+    };
+    let loaded = Loaded::Config(config.clone());
+    let find = |list: Vec<Browser>| {
+        list.into_iter()
+            .find(|b| b.id.eq_ignore_ascii_case(&config.default_browser_id))
+    };
+    find(quick_browsers(&loaded))
+        .or_else(|| find(all_browsers(&loaded)))
+        .or_else(|| all_browsers(&loaded).into_iter().next())
+        .ok_or(LinkError::BrowserNotFound(
+            config.default_browser_id.clone(),
+        ))
+}
+
+/// Decide navegador y URL según la config efectiva.
 pub fn route(raw: &str) -> Result<router::Decision> {
-    let loaded =
-        config::load_effective(&paths::config_path()?, &paths::fallback_path()?).or_else(|e| {
-            warn!(error = %e, "sin config ni respaldo; uso el primer navegador detectado");
-            let first = all_browsers(&Loaded::Config(Default::default()))
-                .into_iter()
-                .next()
-                .ok_or(LinkError::BrowserNotFound("ninguno".into()))?;
-            Ok::<Loaded, LinkError>(Loaded::Fallback(first))
-        })?;
+    let loaded = effective()?;
 
     // Casi siempre basta con los destinos baratos. Si la regla apunta a otro (registro o webapp),
     // recién entonces se leen el registro y los accesos directos (~50 ms más por clic).

@@ -39,6 +39,15 @@ pub fn parse_link(raw: &str) -> Result<Url> {
     Ok(url)
 }
 
+/// Archivo local (ruta absoluta o `file:`) que Windows entrega al abrir un `.html` con Switchman:
+/// va intacto al navegador por defecto, sin reglas ni limpieza.
+pub fn is_local_file(raw: &str) -> bool {
+    let raw = raw.trim();
+    raw.get(..5)
+        .is_some_and(|p| p.eq_ignore_ascii_case("file:"))
+        || std::path::Path::new(raw).is_absolute()
+}
+
 /// Elige el navegador y la regla de redirección que mejor se ajuste al enlace proporcionado,
 /// priorizando patrones válidos en la configuración del usuario.
 fn pick(config: &Config, url: &Url) -> (String, Option<String>, bool) {

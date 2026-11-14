@@ -1,9 +1,9 @@
 //! Subcomandos del CLI. Toda la lógica vive en `switchman_core`.
-use crate::routing::{all_browsers, route};
+use crate::routing::{all_browsers, default_browser, route};
 use serde_json::json;
 use switchman_core::config::{self, Loaded};
 use switchman_core::error::{LinkError, Result};
-use switchman_core::{launcher, paths, protocols, registry};
+use switchman_core::{launcher, paths, protocols, registry, router};
 use tracing::{info, warn};
 
 /// URI de Configuración de Windows para elegir el navegador predeterminado.
@@ -18,8 +18,15 @@ fn config_or_default() -> Result<Loaded> {
     Ok(Loaded::Config(config))
 }
 
-/// Enruta y abre un enlace (lo invoca Windows en cada clic).
+/// Enruta y abre un enlace (lo invoca Windows en cada clic). Un `.html` local (Switchman también
+/// atiende esa extensión) va intacto al navegador por defecto.
 pub fn open_url(raw: &str) -> Result<()> {
+    if router::is_local_file(raw) {
+        let browser = default_browser()?;
+        launcher::launch_arg(&browser, raw.trim(), &std::env::current_exe()?)?;
+        info!(browser = %browser.id, "archivo local abierto");
+        return Ok(());
+    }
     let decision = route(raw)?;
     if let Some(app) = &decision.app {
         match protocols::open_uri(&app.uri) {

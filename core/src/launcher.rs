@@ -46,6 +46,11 @@ pub fn launch_args(args: &[String], url: &str) -> Vec<String> {
 
 /// Lanza el navegador especificado con la URL proporcionada, verificando primero que no se lance a sí mismo.
 pub fn launch(browser: &Browser, url: &Url, self_exe: &Path) -> Result<()> {
+    launch_arg(browser, url.as_str(), self_exe)
+}
+
+/// Igual que [`launch`] pero con el argumento tal cual (p. ej. la ruta de un `.html` local).
+pub fn launch_arg(browser: &Browser, target: &str, self_exe: &Path) -> Result<()> {
     let exe = Path::new(browser.exe_path.trim());
     if same_exe(exe, self_exe) {
         return Err(LinkError::SelfLaunch);
@@ -54,7 +59,7 @@ pub fn launch(browser: &Browser, url: &Url, self_exe: &Path) -> Result<()> {
         return Err(LinkError::BrowserNotFound(browser.exe_path.clone()));
     }
     Command::new(exe)
-        .args(launch_args(&browser.args, url.as_str()))
+        .args(launch_args(&browser.args, target))
         .spawn()?;
     Ok(())
 }

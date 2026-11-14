@@ -7,6 +7,10 @@ use winreg::RegKey;
 
 pub const APP_NAME: &str = "Switchman";
 const PROG_ID: &str = "SwitchmanURL";
+/// ProgID para páginas `.htm`/`.html`: muchas apps de escritorio (Phone Link, entre otras) no abren
+/// el navegador de `https`, sino el de `.html`. Sin esto se saltaban Switchman.
+const HTML_PROG_ID: &str = "SwitchmanHTML";
+const HTML_EXTENSIONS: [&str; 2] = [".htm", ".html"];
 const CLIENTS: &str = r"Software\Clients\StartMenuInternet";
 const URL_ASSOC: &str = r"Software\Microsoft\Windows\Shell\Associations\UrlAssociations";
 
@@ -68,7 +72,8 @@ pub fn register(exe: &Path) -> Result<()> {
     let client = format!(r"{CLIENTS}\{APP_NAME}");
     let caps = format!(r"{client}\Capabilities");
     let classes = format!(r"Software\Classes\{PROG_ID}");
-    let entries: Vec<(String, &str, String)> = vec![
+    let icon_for_html = icon.clone();
+    let mut entries: Vec<(String, &str, String)> = vec![
         (classes.clone(), "", "Switchman URL".to_string()),
         (format!(r"{classes}\DefaultIcon"), "", icon.clone()),
         (format!(r"{classes}\shell\open\command"), "", cmd.clone()),
@@ -102,6 +107,22 @@ pub fn register(exe: &Path) -> Result<()> {
             caps.clone(),
         ),
     ];
+    let html = format!(r"Software\Classes\{HTML_PROG_ID}");
+    entries.push((html.clone(), "", "Switchman HTML".to_string()));
+    entries.push((format!(r"{html}\DefaultIcon"), "", icon_for_html));
+    entries.push((format!(r"{html}\shell\open\command"), "", cmd.clone()));
+    for ext in HTML_EXTENSIONS {
+        entries.push((
+            format!(r"{caps}\FileAssociations"),
+            ext,
+            HTML_PROG_ID.to_string(),
+        ));
+        entries.push((
+            format!(r"Software\Classes\{ext}\OpenWithProgids"),
+            HTML_PROG_ID,
+            String::new(),
+        ));
+    }
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     for (path, name, value) in &entries {
         let (key, _) = hkcu.create_subkey(path)?;
@@ -115,6 +136,7 @@ pub fn unregister() -> Result<()> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     for path in [
         format!(r"Software\Classes\{PROG_ID}"),
+        format!(r"Software\Classes\{HTML_PROG_ID}"),
         format!(r"{CLIENTS}\{APP_NAME}"),
     ] {
         match hkcu.delete_subkey_all(&path) {
@@ -132,6 +154,17 @@ pub fn unregister() -> Result<()> {
             Ok(()) => {}
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
             Err(e) => return Err(e.into()),
+        }
+    }
+
+    for ext in HTML_EXTENSIONS {
+        let path = format!(r"Software\Classes\{ext}\OpenWithProgids");
+        if let Ok(key) = hkcu.open_subkey_with_flags(&path, winreg::enums::KEY_SET_VALUE) {
+            match key.delete_value(HTML_PROG_ID) {
+                Ok(()) => {}
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+                Err(e) => return Err(e.into()),
+            }
         }
     }
 

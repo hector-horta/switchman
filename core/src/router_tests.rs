@@ -117,3 +117,13 @@ fn unknown_browser_id_errors() {
         Err(LinkError::BrowserNotFound(_))
     ));
 }
+
+#[test]
+fn local_files_are_recognized() {
+    assert!(is_local_file(r"C:\Users\a\page.html"));
+    assert!(is_local_file("  file:///C:/a.html "));
+    assert!(is_local_file(r"\\server\share\a.htm"));
+    assert!(!is_local_file("https://a.com/x.html"));
+    assert!(!is_local_file("page.html"));
+    assert!(!is_local_file(""));
+}
