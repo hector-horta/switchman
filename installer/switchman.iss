@@ -1,4 +1,4 @@
-; Instalador por usuario de Switchman (sin administrador).
+﻿; Instalador por usuario de Switchman (sin administrador).
 ; Compilar: ISCC /DAppVersion=0.4.0 /DArch=x64 /DSourceDir=<carpeta publicada> installer\switchman.iss
 
 #ifndef AppVersion
