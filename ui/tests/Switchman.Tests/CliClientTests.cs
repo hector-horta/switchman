@@ -51,7 +51,7 @@ public sealed class CliClientTests
         var runner = new FakeRunner(new CliResult(CliExit.Ok, "no json", ""));
         var r = await Client(runner).StatusAsync(CancellationToken.None);
         Assert.Equal(CliExit.Error, r.Exit);
-        Assert.StartsWith("respuesta inválida", r.Error, StringComparison.Ordinal);
+        Assert.StartsWith(Localized.Format(Strings.CliInvalid, ""), r.Error, StringComparison.Ordinal);
     }
 
     [Fact] public async Task EmptyStderrUsesExitCode()
