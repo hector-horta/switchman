@@ -88,7 +88,7 @@ pub fn register(exe: &Path) -> Result<()> {
         (
             caps.clone(),
             "ApplicationDescription",
-            "Enrutador de enlaces que quita parámetros de rastreo".to_string(),
+            "Link router that removes tracking parameters".to_string(),
         ),
         (caps.clone(), "ApplicationIcon", icon),
         (

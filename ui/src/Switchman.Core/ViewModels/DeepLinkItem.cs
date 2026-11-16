@@ -27,7 +27,7 @@ public sealed partial class DeepLinkItem : ObservableObject
     public partial string Template { get; set; } = "";
 
     /// <summary>Texto de la lista: el nombre, o una indicación si todavía no tiene.</summary>
-    public string Title => string.IsNullOrWhiteSpace(Name) ? "Nuevo deep link" : Name;
+    public string Title => string.IsNullOrWhiteSpace(Name) ? Strings.AppsNewLink : Name;
 
     public static DeepLinkItem From(CustomDeepLinkInfo info)
     {

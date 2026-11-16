@@ -61,7 +61,7 @@ public sealed partial class RulesViewModel(ConfigSession session, ICliClient cli
         {
             // Config nueva: sin navegador por defecto el CLI la rechaza. Se usa el primero detectado y se avisa.
             config = config with { DefaultBrowserId = Browsers[0].Id };
-            note = $" · navegador por defecto: {Browsers[0].Name} (cámbialo en Navegadores)";
+            note = Localized.Format(Strings.RulesDefaultNote, Browsers[0].Name);
         }
         var outcome = await _session.SaveAsync(config, ct).ConfigureAwait(true);
         ShowOutcome(outcome, note);

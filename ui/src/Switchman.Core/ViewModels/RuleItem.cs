@@ -21,7 +21,7 @@ public sealed partial class RuleItem : ObservableObject
     public partial string BrowserName { get; set; } = "";
 
     /// <summary>Texto de la lista: el dominio, o una indicación si todavía está vacío.</summary>
-    public string Title => string.IsNullOrWhiteSpace(Pattern) ? "Nueva regla: escribe un dominio" : Pattern;
+    public string Title => string.IsNullOrWhiteSpace(Pattern) ? Strings.RulesNewTitle : Pattern;
 
     /// <summary>Traduce id → nombre; la fija RulesViewModel, que conoce los navegadores detectados.</summary>
     public Func<string?, string>? NameLookup

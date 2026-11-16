@@ -28,11 +28,11 @@ pub fn all_browsers(loaded: &Loaded) -> Vec<Browser> {
 /// Config efectiva; si falta la config usa el respaldo, y si falta este, el primer detectado.
 fn effective() -> Result<Loaded> {
     config::load_effective(&paths::config_path()?, &paths::fallback_path()?).or_else(|e| {
-        warn!(error = %e, "sin config ni respaldo; uso el primer navegador detectado");
+        warn!(error = %e, "no config and no fallback; using the first detected browser");
         let first = all_browsers(&Loaded::Config(Default::default()))
             .into_iter()
             .next()
-            .ok_or(LinkError::BrowserNotFound("ninguno".into()))?;
+            .ok_or(LinkError::BrowserNotFound("none detected".into()))?;
         Ok(Loaded::Fallback(first))
     })
 }
@@ -79,7 +79,7 @@ fn full_route(loaded: &Loaded, raw: &str) -> Result<router::Decision> {
     let browsers = all_browsers(loaded);
     let decision = match router::decide(loaded, &browsers, raw) {
         Err(LinkError::BrowserNotFound(id)) => {
-            warn!(%id, "navegador de la regla no encontrado; uso el respaldo");
+            warn!(%id, "rule browser not found; using the fallback");
             let fallback = switchman_core::store::read_json::<Browser>(&paths::fallback_path()?)
                 .ok()
                 .or_else(|| browsers.first().cloned())

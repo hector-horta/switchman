@@ -96,7 +96,7 @@ pub fn registered_schemes() -> Vec<String> {
 /// Abre una URI con el explorador de Windows usando el protocolo registrado.
 pub fn open_uri(uri: &str) -> Result<()> {
     let Some((scheme, _)) = uri.split_once(':') else {
-        return Err(LinkError::InvalidUrl(format!("sin protocolo: {}", uri)));
+        return Err(LinkError::InvalidUrl(format!("no protocol: {}", uri)));
     };
     if is_system_scheme(scheme) || scheme.is_empty() {
         return Err(LinkError::UnsupportedScheme(scheme.to_string()));
@@ -127,7 +127,7 @@ pub fn open_uri(uri: &str) -> Result<()> {
         Ok(())
     } else {
         Err(LinkError::Io(std::io::Error::other(format!(
-            "ShellExecuteW devolvió {} para {}",
+            "ShellExecuteW returned {} for {}",
             code, scheme
         ))))
     }

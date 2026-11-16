@@ -2,13 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    
-    
+    <!-- Inglés es el idioma neutro (Strings.resx); Strings.es.resx va como ensamblado satélite. -->
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0" />
+  </ItemGroup>
+
+  <!-- Clase Strings generada al compilar (pública: la usa el XAML de la App con x:Bind). -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx"
+                      StronglyTypedFileName="$(IntermediateOutputPath)Strings.Designer.cs"
+                      StronglyTypedLanguage="CSharp"
+                      StronglyTypedNamespace="Switchman.Core.Resources"
+                      StronglyTypedClassName="Strings"
+                      PublicClass="true" />
   </ItemGroup>
 
 </Project>

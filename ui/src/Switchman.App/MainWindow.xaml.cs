@@ -49,7 +49,7 @@ public sealed partial class MainWindow : Window
         AppServices.Dialogs.Attach(Root.XamlRoot);
         if (NavView.SettingsItem is NavigationViewItem settings)
         {
-            settings.Content = "Ajustes";
+            settings.Content = Strings.NavSettings;
         }
     }
 

@@ -38,23 +38,23 @@ pub(crate) fn check_id(kind: &str, id: &str) -> Result<()> {
     if ok {
         Ok(())
     } else {
-        Err(LinkError::Config(format!("{kind} inválido: {id:?}")))
+        Err(LinkError::Config(format!("invalid {kind}: {id:?}")))
     }
 }
 
 /// Valida toda la configuración (`Config`) asegurando que los IDs cumplen los requisitos,
 /// las rutas de navegadores no están vacías y los patrones de host son válidos.
 pub fn validate(config: &Config) -> Result<()> {
-    check_id("navegador por defecto", &config.default_browser_id)?;
+    check_id("default browser", &config.default_browser_id)?;
     for rule in &config.rules {
         check_id("regla", &rule.id)?;
-        check_id("navegador de la regla", &rule.browser_id)?;
+        check_id("rule browser", &rule.browser_id)?;
         HostPattern::parse(&rule.pattern)?;
     }
     for b in &config.custom_browsers {
-        check_id("navegador", &b.id)?;
+        check_id("browser", &b.id)?;
         if b.exe_path.trim().is_empty() {
-            return Err(LinkError::Config(format!("ruta vacía para {}", b.id)));
+            return Err(LinkError::Config(format!("empty path for {}", b.id)));
         }
     }
     crate::deeplinks::validate(config)
@@ -75,10 +75,10 @@ pub fn save(path: &Path, config: &Config) -> Result<()> {
 
 /// Guarda el navegador de respaldo en un archivo JSON atómico tras validar su ID y ruta.
 pub fn save_fallback(path: &Path, browser: &Browser) -> Result<()> {
-    check_id("navegador de respaldo", &browser.id)?;
+    check_id("fallback browser", &browser.id)?;
     if browser.exe_path.trim().is_empty() {
         return Err(LinkError::Config(
-            "ruta vacía en el navegador de respaldo".into(),
+            "empty path in the fallback browser".into(),
         ));
     }
     store::write_json_atomic(path, browser)
@@ -90,11 +90,11 @@ pub fn load_effective(config_path: &Path, fallback_path: &Path) -> Result<Loaded
     match load(config_path) {
         Ok(c) => return Ok(Loaded::Config(c)),
         Err(e) => {
-            warn!(error = %e, "config.json inválido o ausente; usando el navegador de respaldo")
+            warn!(error = %e, "config.json invalid or missing; using the fallback browser")
         }
     }
     let browser: Browser = store::read_json(fallback_path)?;
-    check_id("navegador de respaldo", &browser.id)?;
+    check_id("fallback browser", &browser.id)?;
     Ok(Loaded::Fallback(browser))
 }
 

@@ -10,10 +10,10 @@ public sealed partial class LoggingRunner(IProcessRunner inner, ILogger<LoggingR
     private readonly IProcessRunner _inner = inner;
     private readonly ILogger<LoggingRunner> _logger = logger;
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "switchman {Command} -> {Exit} en {ElapsedMs} ms")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "switchman {Command} -> {Exit} in {ElapsedMs} ms")]
     private partial void LogCall(string command, CliExit exit, long elapsedMs);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "switchman {Command} falló ({Exit}): {Error}")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "switchman {Command} failed ({Exit}): {Error}")]
     private partial void LogFailure(string command, CliExit exit, string error);
 
     public async Task<CliResult> RunAsync(IReadOnlyList<string> args, string? stdin, CancellationToken ct)

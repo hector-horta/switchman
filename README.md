@@ -41,7 +41,7 @@ No network access, no telemetry, no account. Your configuration is a local JSON 
 - **Safe fallbacks**: if `config.json` is missing or damaged, links still open, in the fallback
   browser you chose (or the first one detected). A broken config never leaves you without a browser.
 - **Installed web apps as destinations**: apps installed from a Chromium browser (Helium, Chrome, Edge,
-  Brave → *Install app*) show up next to the browsers, e.g. "Instagram (app de Helium)". A rule like
+  Brave → *Install app*) show up next to the browsers, e.g. "Instagram (Helium)". A rule like
   `instagram.com` → that app opens the link **inside the app window**, not in a browser tab.
 - **Desktop apps by deep link**: links to WhatsApp, Discord, Teams, Telegram, Zoom, Slack, Spotify or Notion
   open in their desktop app (one switch per app), and you can add deep links for any other app that
@@ -58,7 +58,7 @@ Any parameter starting with `utm_`, plus:
 `ttclid` `li_fat_id` `yclid` `mc_cid` `mc_eid` `_hsenc` `_hsmi` `mkt_tok` `vero_id` `wickedid`
 `oly_anon_id` `oly_enc_id` `rb_clickid` `s_cid` `si`.
 
-You can add your own in **Ajustes → Parámetros extra a quitar** (Settings → Extra parameters).
+You can add your own in **Settings → Extra parameters to remove**.
 
 ## Installation
 
@@ -75,12 +75,12 @@ SDK ship inside the package.
    ```
    The installer copies Switchman to `%LOCALAPPDATA%\Programs\Switchman`, adds it to the Start menu
    and registers it as a browser. Windows **Settings → Default apps** opens at the end.
-4. Open **Switchman** from the Start menu, go to **Navegadores** (Browsers), pick your default browser
-   (and, optionally, a fallback) and click **Guardar** (Save). Add any **Reglas** (Rules) you want.
+4. Open **Switchman** from the Start menu, go to **Browsers**, pick your default browser
+   (and, optionally, a fallback) and click **Save**. Add any **Rules** you want.
 5. In **Settings → Default apps**, search for **Switchman** and click **Set default**. Windows
    only lets you make this choice yourself; no app can do it for you.
 
-From now on every link goes through Switchman. The app's **Ajustes** (Settings) page shows whether
+From now on every link goes through Switchman. The app's **Settings** page shows whether
 Switchman is the default browser.
 
 > **SmartScreen:** the executables are not code-signed yet, so Windows may show "Windows protected
@@ -102,20 +102,21 @@ Then pick another default browser in Windows Settings.
 
 ## Using it
 
-The interface is in Spanish; English names are given in brackets.
+The interface is in English or Spanish, following the Windows display language. To force one, set
+the `SWITCHMAN_LANG` environment variable to `en` or `es`.
 
 | Page | What it is for |
 | --- | --- |
-| **Reglas** (Rules) | Domain or path → browser, and whether to strip tracking for that rule. |
-| **Navegadores** (Browsers) | Default browser (links with no rule) and fallback browser (used if `config.json` is missing or damaged). |
-| **Probar enlace** (Test link) | Paste a link and see the browser, the rule applied and the clean URL. Nothing is opened. |
-| **Ajustes** (Settings) | Tracking cleanup on/off, extra parameters, and the Windows default-browser status. |
+| **Rules** | Domain or path → browser, and whether to strip tracking for that rule. |
+| **Browsers** | Default browser (links with no rule) and fallback browser (used if `config.json` is missing or damaged). |
+| **Test link** | Paste a link and see the browser, the rule applied and the clean URL. Nothing is opened. |
+| **Settings** | Tracking cleanup on/off, extra parameters, and the Windows default-browser status. |
 
 ### Opening links in installed web apps
 
 Install the site as an app from your Chromium browser (*Install app* / *Install this site as an app*).
-Switchman finds it in the Start menu and lists it under **Navegadores**, so you can pick it in a rule:
-`instagram.com` → **Instagram (app de Helium)**. Each link opens in a new window of that app.
+Switchman finds it in the Start menu and lists it under **Browsers**, so you can pick it in a rule:
+`instagram.com` → **Instagram (Helium)**. Each link opens in a new window of that app.
 
 Under the hood the app is launched as
 `chrome_proxy.exe --profile-directory=Default --app-id=<id> --app-launch-url-for-shortcuts-menu-item=<url>`.
@@ -141,7 +142,7 @@ has a switch; when it is on, its web links are translated and opened in the app:
 | `notion.so/…` | `notion://www.notion.so/…` |
 
 Your rules come first, tracking parameters are removed before translating, and a link with no app form
-(for example `wa.me/message/…`) opens in the browser as usual. **Buscar apps** rescans the system: newly
+(for example `wa.me/message/…`) opens in the browser as usual. **Find apps** rescans the system: newly
 installed catalog apps get their switch, and every other installed protocol is listed so you can create
 your own deep link for it: domains + a template such as `steam://openurl/{url}` (placeholders `{url}`,
 `{host}`, `{path}`, `{query}`).

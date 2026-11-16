@@ -166,7 +166,7 @@ pub fn validate(config: &Config) -> Result<()> {
     for id in &config.app_links {
         if !CATALOG.iter().any(|app| app.id == id) {
             return Err(LinkError::Config(format!(
-                "app de deep link desconocida: {id:?}"
+                "unknown deep link app: {id:?}"
             )));
         }
     }
@@ -190,11 +190,11 @@ fn validate_custom(link: &CustomDeepLink) -> Result<()> {
     check_id("deep link", &link.id)?;
 
     if link.name.trim().is_empty() || link.name.chars().count() > MAX_NAME {
-        return bad("nombre vacío o demasiado largo");
+        return bad("name is empty or too long");
     }
 
     if !valid_scheme(&link.scheme) {
-        return bad("protocolo inválido");
+        return bad("invalid protocol");
     }
 
     if link.template.len() > MAX_TEMPLATE
@@ -203,16 +203,16 @@ fn validate_custom(link: &CustomDeepLink) -> Result<()> {
             .to_ascii_lowercase()
             .starts_with(&format!("{}:", link.scheme))
     {
-        return bad("la plantilla debe empezar con su protocolo");
+        return bad("the template must start with its protocol");
     }
 
     if link.domains.is_empty() || link.domains.len() > MAX_DOMAINS {
-        return bad("se necesita entre 1 y 20 dominios");
+        return bad("between 1 and 20 domains are needed");
     }
 
     for domain in &link.domains {
         if domain.contains('/') {
-            return bad("los dominios no llevan ruta");
+            return bad("domains must not include a path");
         }
         HostPattern::parse(domain)?;
     }

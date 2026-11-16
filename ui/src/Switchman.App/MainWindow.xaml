@@ -3,6 +3,7 @@
     x:Class="Switchman.App.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:res="using:Switchman.Core.Resources"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Switchman.App"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -37,22 +38,22 @@
             IsPaneToggleButtonVisible="False"
             SelectionChanged="NavView_SelectionChanged">
             <NavigationView.MenuItems>
-                <NavigationViewItem Content="Reglas" IsSelected="True" Tag="rules">
+                <NavigationViewItem Content="{x:Bind res:Strings.NavRules, Mode=OneTime}" IsSelected="True" Tag="rules">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE71C;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Navegadores" Tag="browsers">
+                <NavigationViewItem Content="{x:Bind res:Strings.NavBrowsers, Mode=OneTime}" Tag="browsers">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE774;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Apps" Tag="apps">
+                <NavigationViewItem Content="{x:Bind res:Strings.NavApps, Mode=OneTime}" Tag="apps">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE71D;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Probar enlace" Tag="test">
+                <NavigationViewItem Content="{x:Bind res:Strings.NavTest, Mode=OneTime}" Tag="test">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE71B;" />
                     </NavigationViewItem.Icon>

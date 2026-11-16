@@ -25,7 +25,7 @@ pub fn parse_link(raw: &str) -> Result<Url> {
     let raw = raw.trim();
     if raw.is_empty() || raw.len() > MAX_URL_LEN {
         return Err(LinkError::InvalidUrl(format!(
-            "largo inválido: {}",
+            "invalid length: {}",
             raw.len()
         )));
     }
@@ -34,7 +34,7 @@ pub fn parse_link(raw: &str) -> Result<Url> {
         return Err(LinkError::UnsupportedScheme(url.scheme().to_string()));
     }
     if url.host_str().is_none() {
-        return Err(LinkError::InvalidUrl("sin host".into()));
+        return Err(LinkError::InvalidUrl("no host".into()));
     }
     Ok(url)
 }

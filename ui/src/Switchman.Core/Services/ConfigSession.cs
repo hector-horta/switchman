@@ -55,7 +55,7 @@ public sealed class ConfigSession(ICliClient cli, IDialogService dialogs)
         if (response.IsOk)
         {
             Accept(new VersionedConfig(response.Value!.Revision, config));
-            return new SaveOutcome(SaveStatus.Saved, "Guardado");
+            return new SaveOutcome(SaveStatus.Saved, Strings.SaveSaved);
         }
 
         if (response.Exit != CliExit.Conflict)
@@ -68,7 +68,7 @@ public sealed class ConfigSession(ICliClient cli, IDialogService dialogs)
         {
             ConflictChoice.Reload => await ReloadAfterConflictAsync(ct).ConfigureAwait(false),
             ConflictChoice.Overwrite => await OverwriteAsync(config, ct).ConfigureAwait(false),
-            _ => new SaveOutcome(SaveStatus.Cancelled, "No se guardó"),
+            _ => new SaveOutcome(SaveStatus.Cancelled, Strings.SaveNotSaved),
         };
     }
 
@@ -105,7 +105,7 @@ public sealed class ConfigSession(ICliClient cli, IDialogService dialogs)
         }
 
         Accept(new VersionedConfig(response.Value!.Revision, config));
-        return new SaveOutcome(SaveStatus.Saved, "Guardado (se sobrescribió config.json)");
+        return new SaveOutcome(SaveStatus.Saved, Strings.SaveOverwritten);
     }
 
     /// <summary>El usuario eligió recargar: se descarta lo editado y se lee config.json.</summary>
@@ -113,7 +113,7 @@ public sealed class ConfigSession(ICliClient cli, IDialogService dialogs)
     {
         var response = await LoadAsync(ct).ConfigureAwait(false);
         return response.IsOk
-            ? new SaveOutcome(SaveStatus.Reloaded, "Se recargó config.json; tus cambios no se guardaron")
+            ? new SaveOutcome(SaveStatus.Reloaded, Strings.SaveReloaded)
             : new SaveOutcome(SaveStatus.Failed, response.Error);
     }
 

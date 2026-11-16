@@ -115,7 +115,7 @@ public sealed partial class AppsViewModel(ConfigSession session, ICliClient cli)
 
         _hiddenEnabled = enabled.Where(id => !Apps.Any(a => a.Id == id)).ToList();
         var missing = info.Value.Catalog.Where(a => !a.Installed).Select(a => a.Name).ToList();
-        NotInstalled = missing.Count == 0 ? "" : "Del catálogo, sin instalar: " + string.Join(", ", missing);
+        NotInstalled = missing.Count == 0 ? "" : Localized.Format(Strings.AppsNotInstalled, string.Join(", ", missing));
 
         CustomLinks.Clear();
         foreach (var link in info.Value.Custom)

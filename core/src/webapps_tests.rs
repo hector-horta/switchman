@@ -23,7 +23,7 @@ fn shortcut_with_app_id_becomes_a_destination() {
     )
     .unwrap();
     assert_eq!(b.id, "instagram-app");
-    assert_eq!(b.name, "Instagram (app de Helium)");
+    assert_eq!(b.name, "Instagram (Helium)");
     assert_eq!(b.exe_path, r"C:\H\chrome_proxy.exe");
     assert_eq!(
         b.args,

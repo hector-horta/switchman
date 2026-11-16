@@ -59,8 +59,8 @@ public sealed partial class SettingsViewModel(ConfigSession session, ICliClient 
     {
         var response = register ? await _cli.RegisterAsync(ct).ConfigureAwait(true) : await _cli.UnregisterAsync(ct).ConfigureAwait(true);
         if (!response.IsOk) { Show(MessageKind.Error, response.Error); }
-        else if (register) { Show(MessageKind.Success, "Registrado. En la Configuración de Windows que se abrió, busca Switchman y pulsa «Establecer como predeterminado»"); }
-        else { Show(MessageKind.Info, "Switchman ya no está registrado como navegador"); }
+        else if (register) { Show(MessageKind.Success, Strings.SettingsRegistered); }
+        else { Show(MessageKind.Info, Strings.SettingsUnregistered); }
         await RefreshStatusAsync(ct).ConfigureAwait(true);
     }
 

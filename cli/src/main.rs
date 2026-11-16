@@ -10,7 +10,7 @@ use switchman_core::error::LinkError;
 use switchman_core::router;
 use tracing::error;
 
-const USAGE: &str = "uso: switchman-cli <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | apps | register | unregister>";
+const USAGE: &str = "usage: switchman-cli <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | apps | register | unregister>";
 
 /// Despacha el subcomando y devuelve 0 (ok), 1 (error) o 2 (uso incorrecto).
 fn main() -> ExitCode {
@@ -44,7 +44,7 @@ fn main() -> ExitCode {
     match result {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
-            error!(error = %e, command = cmd, "fallo");
+            error!(error = %e, command = cmd, "failed");
             eprintln!("error: {e}");
             ExitCode::from(match e {
                 LinkError::Corrupt(_) => 3,

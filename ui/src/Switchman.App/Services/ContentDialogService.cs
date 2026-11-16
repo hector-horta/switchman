@@ -43,13 +43,11 @@ internal sealed class ContentDialogService : IDialogService
             var dialog = new ContentDialog
             {
                 XamlRoot = _root,
-                Title = "config.json cambió fuera de la app",
-                Content = detail + Environment.NewLine + Environment.NewLine +
-                    "Recargar descarta tus cambios. Sobrescribir guarda tu versión encima " +
-                    "(si el archivo estaba dañado, se guarda una copia .bak).",
-                PrimaryButtonText = "Recargar",
-                SecondaryButtonText = "Sobrescribir",
-                CloseButtonText = "Cancelar",
+                Title = Strings.ConflictTitle,
+                Content = detail + Environment.NewLine + Environment.NewLine + Strings.ConflictBody,
+                PrimaryButtonText = Strings.ConflictReload,
+                SecondaryButtonText = Strings.ConflictOverwrite,
+                CloseButtonText = Strings.ConflictCancel,
                 DefaultButton = ContentDialogButton.Primary,
             };
             var result = await dialog.ShowAsync();

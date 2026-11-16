@@ -1,3 +1,4 @@
+using System.Globalization;
 using Switchman.App.Services;
 using Microsoft.UI.Xaml;
 
@@ -16,6 +17,7 @@ public partial class App : Application
     /// </summary>
     public App()
     {
+        ApplyLanguageOverride();
         InitializeComponent();
         // Tres vías: WinUI no ve las excepciones que escapan por CoreMessaging (0xc000027b)
         // ni las de tareas sin observar; AppDomain registra lo que de todos modos va a cerrar la app.
@@ -32,6 +34,25 @@ public partial class App : Application
             AppServices.Logger.LogUnobserved(e.Exception);
             e.SetObserved();
         };
+    }
+
+    /// <summary>El idioma sigue al de Windows; SWITCHMAN_LANG (p. ej. "en", "es") lo fuerza.</summary>
+    private static void ApplyLanguageOverride()
+    {
+        if (Environment.GetEnvironmentVariable("SWITCHMAN_LANG") is not { Length: > 0 } lang)
+        {
+            return;
+        }
+        try
+        {
+            var culture = CultureInfo.GetCultureInfo(lang);
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            CultureInfo.CurrentUICulture = culture;
+        }
+        catch (CultureNotFoundException)
+        {
+            // Valor inválido: se queda el idioma de Windows.
+        }
     }
 
     /// <summary>

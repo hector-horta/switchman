@@ -1,12 +1,12 @@
 ﻿<#
 .SYNOPSIS
-  Instala (o desinstala) Switchman para el usuario actual, sin permisos de administrador.
+  Installs (or uninstalls) Switchman for the current user, without administrator rights.
 .DESCRIPTION
-  Desde el zip del release usa los ejecutables que trae; desde el código fuente compila el CLI de
-  Rust y publica la UI WinUI3. Copia ambos a -Dest, crea el acceso directo
-  del menú Inicio y registra Switchman como navegador (abre Configuración para elegirlo).
-  -Uninstall quita el registro, el acceso directo y la carpeta. Nunca borra la config del usuario
-  (%LOCALAPPDATA%\Switchman).
+  From the release zip it uses the bundled executables; from the source tree it builds the Rust
+  CLI and publishes the WinUI 3 app. It copies both to -Dest, creates the Start menu shortcut
+  and registers Switchman as a browser (Windows Settings opens so you can choose it).
+  -Uninstall removes the registration, the shortcut and the folder. It never deletes the user's
+  configuration (%LOCALAPPDATA%\Switchman).
 #>
 param(
     [switch]$Uninstall,
@@ -19,7 +19,7 @@ $shortcut = Join-Path ([Environment]::GetFolderPath('Programs')) 'Switchman.lnk'
 
 function Invoke-Cli([string]$Command) {
     $p = Start-Process -FilePath $cli -ArgumentList $Command -Wait -PassThru -WindowStyle Hidden
-    if ($p.ExitCode -ne 0) { throw "switchman-cli $Command terminó con $($p.ExitCode)" }
+    if ($p.ExitCode -ne 0) { throw "switchman-cli $Command exited with $($p.ExitCode)" }
 }
 
 function Stop-Switchman {
@@ -27,7 +27,7 @@ function Stop-Switchman {
 }
 
 function Assert-Ok([string]$Step) {
-    if ($LASTEXITCODE -ne 0) { throw "$Step falló (código $LASTEXITCODE)" }
+    if ($LASTEXITCODE -ne 0) { throw "$Step failed (exit code $LASTEXITCODE)" }
 }
 
 if ($Uninstall) {
@@ -35,7 +35,7 @@ if ($Uninstall) {
     if (Test-Path $cli) { Invoke-Cli 'unregister' }
     Remove-Item $shortcut -ErrorAction SilentlyContinue
     Remove-Item $Dest -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host 'Switchman desinstalado. La configuración sigue en' (Join-Path $env:LOCALAPPDATA 'Switchman')
+    Write-Host 'Switchman uninstalled. Your configuration is still in' (Join-Path $env:LOCALAPPDATA 'Switchman')
     return
 }
 
@@ -44,11 +44,11 @@ if (Test-Path (Join-Path $PSScriptRoot 'Switchman.exe')) {
     $publish = $PSScriptRoot
     $cliSource = Join-Path $PSScriptRoot 'switchman-cli.exe'
 } else {
-    Write-Host '==> Compilando el CLI de Rust'
+    Write-Host '==> Building the Rust CLI'
     cargo build --release --manifest-path (Join-Path $root 'Cargo.toml')
     Assert-Ok 'cargo build'
 
-    Write-Host '==> Publicando la UI WinUI3'
+    Write-Host '==> Publishing the WinUI 3 app'
     $publish = Join-Path $root 'target\publish'
     Remove-Item $publish -Recurse -Force -ErrorAction SilentlyContinue
     dotnet publish (Join-Path $root 'ui\src\Switchman.App\Switchman.App.csproj') -c Release -r win-x64 -p:Platform=x64 --self-contained -o $publish
@@ -56,7 +56,7 @@ if (Test-Path (Join-Path $PSScriptRoot 'Switchman.exe')) {
     $cliSource = Join-Path $root 'target\release\switchman-cli.exe'
 }
 
-Write-Host '==> Copiando archivos a la carpeta de destino'
+Write-Host '==> Copying files to the install folder'
 Stop-Switchman
 New-Item -ItemType Directory -Force $Dest | Out-Null
 Copy-Item (Join-Path $publish '*') $Dest -Recurse -Force
@@ -64,23 +64,23 @@ Copy-Item $cliSource $Dest -Force
 # Se deja una copia del script en la instalación para poder desinstalar sin el zip.
 Copy-Item $PSCommandPath (Join-Path $Dest 'install.ps1') -Force
 
-Write-Host '==> Comprobando que la UI instalada arranca'
+Write-Host '==> Checking that the installed app starts'
 $probe = Start-Process (Join-Path $Dest 'Switchman.exe') -PassThru
 Start-Sleep -Seconds 5
 if ($probe.HasExited) {
-    throw "Switchman.exe se cerró al arrancar (código $($probe.ExitCode)); ver %LOCALAPPDATA%\Switchman\switchman-ui.log"
+    throw "Switchman.exe closed on startup (exit code $($probe.ExitCode)); see %LOCALAPPDATA%\Switchman\switchman-ui.log"
 }
 Stop-Process -Id $probe.Id -Force
 
-Write-Host '==> Creando acceso directo en el menú Inicio'
+Write-Host '==> Creating the Start menu shortcut'
 $shell = New-Object -ComObject WScript.Shell
 $lnk = $shell.CreateShortcut($shortcut)
 $lnk.TargetPath = Join-Path $Dest 'Switchman.exe'
 $lnk.WorkingDirectory = $Dest
-$lnk.Description = 'Switchman: enruta enlaces y quita parámetros de rastreo'
+$lnk.Description = 'Switchman: routes links and removes tracking parameters'
 $lnk.Save()
 
-Write-Host '==> Registrando Switchman como navegador predeterminado'
+Write-Host '==> Registering Switchman as a browser'
 Invoke-Cli 'register'
 
-Write-Host "Listo. Instalado en $Dest. Elige Switchman como navegador en la ventana de Configuración que se abrió."
+Write-Host "Done. Installed in $Dest. In the Windows Settings page that just opened, choose Switchman as your default browser."

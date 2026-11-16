@@ -12,7 +12,7 @@ const SETTINGS_URI: &str = "ms-settings:defaultapps?registeredAppUser=Switchman"
 /// Config del usuario; si falta o está corrupta, una vacía (solo para listar navegadores).
 fn config_or_default() -> Result<Loaded> {
     let config = config::load(&paths::config_path()?).unwrap_or_else(|e| {
-        warn!(error = %e, "config no disponible; uso una vacía");
+        warn!(error = %e, "config not available; using an empty one");
         Default::default()
     });
     Ok(Loaded::Config(config))
@@ -24,7 +24,7 @@ pub fn open_url(raw: &str) -> Result<()> {
     if router::is_local_file(raw) {
         let browser = default_browser()?;
         launcher::launch_arg(&browser, raw.trim(), &std::env::current_exe()?)?;
-        info!(browser = %browser.id, "archivo local abierto");
+        info!(browser = %browser.id, "local file opened");
         return Ok(());
     }
     let decision = route(raw)?;
@@ -33,16 +33,16 @@ pub fn open_url(raw: &str) -> Result<()> {
     if let Some(app) = &decision.app {
         match protocols::open_uri(&app.uri) {
             Ok(()) => {
-                info!(%host, app = %app.id, stripped = decision.stripped, "enlace abierto en la app");
+                info!(%host, app = %app.id, stripped = decision.stripped, "link opened in the app");
                 return Ok(());
             }
             // Si la app no responde, el enlace igual se abre en el navegador.
-            Err(e) => warn!(app = %app.id, error = %e, "no se pudo abrir la app; uso el navegador"),
+            Err(e) => warn!(app = %app.id, error = %e, "could not open the app; using the browser"),
         }
     }
     let self_exe = std::env::current_exe()?;
     launcher::launch(&decision.browser, &decision.url, &self_exe)?;
-    info!(%host, browser = %decision.browser.id, rule = ?decision.rule_id, stripped = decision.stripped, "enlace abierto");
+    info!(%host, browser = %decision.browser.id, rule = ?decision.rule_id, stripped = decision.stripped, "link opened");
     Ok(())
 }
 
@@ -78,7 +78,7 @@ pub fn set_fallback(id: &str) -> Result<()> {
         .find(|b| b.id.eq_ignore_ascii_case(id.trim()))
         .ok_or_else(|| LinkError::BrowserNotFound(id.to_string()))?;
     config::save_fallback(&paths::fallback_path()?, &browser)?;
-    info!(browser = %browser.id, "navegador de respaldo guardado");
+    info!(browser = %browser.id, "fallback browser saved");
     Ok(())
 }
 
@@ -86,7 +86,7 @@ pub fn set_fallback(id: &str) -> Result<()> {
 pub fn register() -> Result<()> {
     let exe = std::env::current_exe()?;
     registry::register(&exe)?;
-    info!(exe = %exe.display(), "switchman registrado");
+    info!(exe = %exe.display(), "switchman registered");
     open_settings()
 }
 
@@ -117,7 +117,7 @@ fn open_settings() -> Result<()> {
         Ok(())
     } else {
         Err(LinkError::Io(std::io::Error::other(format!(
-            "no se pudo abrir Configuración (ShellExecuteW = {code})"
+            "could not open Windows Settings (ShellExecuteW = {code})"
         ))))
     }
 }
@@ -125,6 +125,6 @@ fn open_settings() -> Result<()> {
 /// Elimina el registro de switchman en HKCU.
 pub fn unregister() -> Result<()> {
     registry::unregister()?;
-    info!("switchman desregistrado");
+    info!("switchman unregistered");
     Ok(())
 }

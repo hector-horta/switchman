@@ -13,13 +13,13 @@ $stage = Join-Path $root "target\dist\$name"
 $zip = Join-Path $root "target\dist\$name.zip"
 
 cargo build --release --manifest-path (Join-Path $root 'Cargo.toml')
-if ($LASTEXITCODE -ne 0) { throw 'cargo build falló' }
+if ($LASTEXITCODE -ne 0) { throw 'cargo build failed' }
 Remove-Item $stage, $zip -Recurse -Force -ErrorAction SilentlyContinue
 dotnet publish (Join-Path $root 'ui\src\Switchman.App\Switchman.App.csproj') -c Release -r win-x64 -p:Platform=x64 --self-contained -p:Version=$version -o $stage
-if ($LASTEXITCODE -ne 0) { throw 'dotnet publish falló' }
+if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
 
 Copy-Item (Join-Path $root 'target\release\switchman-cli.exe') $stage
 Copy-Item (Join-Path $PSScriptRoot 'install.ps1') $stage
 Copy-Item (Join-Path $root 'README.md'), (Join-Path $root 'README.es.md') $stage
 Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip -CompressionLevel Optimal
-Write-Host "Listo: $zip ($([math]::Round((Get-Item $zip).Length / 1MB)) MB)"
+Write-Host "Done: $zip ($([math]::Round((Get-Item $zip).Length / 1MB)) MB)"

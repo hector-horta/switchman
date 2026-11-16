@@ -52,11 +52,11 @@ public sealed class CliClient(IProcessRunner runner) : ICliClient
         try
         {
             var value = JsonSerializer.Deserialize(result.Stdout, type);
-            return new CliResponse<T>(CliExit.Ok, value, value is null ? "respuesta vacía de switchman" : "");
+            return new CliResponse<T>(CliExit.Ok, value, value is null ? Strings.CliEmpty : "");
         }
         catch (JsonException e)
         {
-            return new CliResponse<T>(CliExit.Error, default, "respuesta inválida de switchman: " + e.Message);
+            return new CliResponse<T>(CliExit.Error, default, Localized.Format(Strings.CliInvalid, e.Message));
         }
     }
 
@@ -73,6 +73,6 @@ public sealed class CliClient(IProcessRunner runner) : ICliClient
     private static string ErrorText(CliResult result)
     {
         var text = result.Stderr.StartsWith("error: ", StringComparison.Ordinal) ? result.Stderr["error: ".Length..] : result.Stderr;
-        return string.IsNullOrWhiteSpace(text) ? $"switchman terminó con {result.Exit}" : text;
+        return string.IsNullOrWhiteSpace(text) ? Localized.Format(Strings.CliExitCode, result.Exit) : text;
     }
 }

@@ -31,7 +31,7 @@ pub fn set_config(expected_revision: &str) -> Result<()> {
     let config: Config =
         serde_json::from_str(&text).map_err(|e| LinkError::Config(e.to_string()))?;
     let revision = revision::save_versioned(&paths::config_path()?, &config, expected_revision)?;
-    info!(%revision, "config guardada desde la UI");
+    info!(%revision, "config saved from the UI");
     print_json(&json!({ "revision": revision }))
 }
 
@@ -47,6 +47,6 @@ pub fn status() -> Result<()> {
 /// Aparta un config.json corrupto como `.bak` e imprime la revisión para guardar de cero.
 pub fn reset_config() -> Result<()> {
     let revision = revision::reset(&paths::config_path()?)?;
-    info!("config.json apartado como .bak");
+    info!("config.json moved aside as .bak");
     print_json(&json!({ "revision": revision }))
 }

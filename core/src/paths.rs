@@ -7,11 +7,11 @@ const APP_DIR: &str = "Switchman";
 /// Devuelve la ruta absoluta al directorio de datos de Switchman en `%LOCALAPPDATA%\Switchman`.
 pub fn data_dir() -> Result<PathBuf> {
     let raw = std::env::var_os("LOCALAPPDATA")
-        .ok_or_else(|| LinkError::Config("LOCALAPPDATA no definida".into()))?;
+        .ok_or_else(|| LinkError::Config("LOCALAPPDATA is not set".into()))?;
     let base = PathBuf::from(raw);
     if !base.is_absolute() {
         Err(LinkError::Config(format!(
-            "LOCALAPPDATA no es absoluta: {}",
+            "LOCALAPPDATA is not absolute: {}",
             base.display()
         )))
     } else {

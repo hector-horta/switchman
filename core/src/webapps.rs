@@ -54,7 +54,7 @@ pub fn from_shortcut(
 
     let label = folder.and_then(|f| f.strip_suffix(" Apps"));
     let display = match label {
-        Some(l) => format!("{name} (app de {l})"),
+        Some(l) => format!("{name} ({l})"),
         None => format!("{name} (app)"),
     };
 

@@ -42,7 +42,7 @@ public sealed class RulesViewModelTests
         Assert.Equal("Google Chrome", vm.Rules[1].BrowserName);
 
         vm.AddRuleCommand.Execute(null);
-        Assert.Equal("Nueva regla: escribe un dominio", vm.Rules[2].Title);
+        Assert.Equal(Strings.RulesNewTitle, vm.Rules[2].Title);
         vm.Rules[2].Pattern = "gitlab.com";
         Assert.Equal("gitlab.com", vm.Rules[2].Title);
     }
@@ -74,7 +74,7 @@ public sealed class RulesViewModelTests
         var saved = Assert.Single(_cli.LastSaved!.Rules);
         Assert.Equal("gitlab.com", saved.Pattern);
         Assert.Equal("edge", _cli.LastSaved.DefaultBrowserId);
-        Assert.Equal("Guardado", vm.Message);
+        Assert.Equal(Strings.SaveSaved, vm.Message);
         Assert.Equal(MessageKind.Success, vm.MessageKind);
         Assert.Contains("set-config:rev1", _cli.Calls);
     }

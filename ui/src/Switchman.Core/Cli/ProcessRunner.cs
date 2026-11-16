@@ -79,7 +79,7 @@ public sealed class ProcessRunner(string exePath, TimeSpan timeout) : IProcessRu
             catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
                 process.Kill(entireProcessTree: true);
-                return new CliResult(CliExit.Timeout, "", "switchman no respondió a tiempo");
+                return new CliResult(CliExit.Timeout, "", Strings.CliTimeout);
             }
         }
         catch (System.ComponentModel.Win32Exception e)

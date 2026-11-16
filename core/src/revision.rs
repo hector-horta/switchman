@@ -60,7 +60,7 @@ pub fn save_versioned(path: &Path, config: &Config, expected: &str) -> Result<St
     }
     config::save(path, config)?;
     let written = read_bytes(path)?
-        .ok_or_else(|| LinkError::Config("config.json desapareció tras guardar".into()))?;
+        .ok_or_else(|| LinkError::Config("config.json disappeared after saving".into()))?;
     Ok(revision_of(&written))
 }
 

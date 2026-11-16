@@ -44,7 +44,7 @@ Sin acceso a la red, sin telemetría, sin cuentas. Tu configuración es un archi
   navegador de respaldo que elegiste (o en el primero detectado). Una config rota nunca te deja sin
   navegador.
 - **Webapps instaladas como destino**: las apps instaladas desde un navegador Chromium (Helium, Chrome,
-  Edge, Brave → *Instalar app*) aparecen junto a los navegadores, p. ej. "Instagram (app de Helium)". Una
+  Edge, Brave → *Instalar app*) aparecen junto a los navegadores, p. ej. "Instagram (Helium)". Una
   regla `instagram.com` → esa app abre el enlace **dentro de la ventana de la app**, no en una pestaña.
 - **Apps de escritorio por deep link**: los enlaces de WhatsApp, Discord, Teams, Telegram, Zoom, Slack, Spotify o
   Notion se abren en su app de escritorio (un interruptor por app), y puedes agregar deep links para cualquier
@@ -105,6 +105,9 @@ eliminarla. Después elige otro navegador predeterminado en la Configuración de
 
 ## Uso
 
+La interfaz está en inglés o en castellano, según el idioma de Windows. Para forzar uno, define la
+variable de entorno `SWITCHMAN_LANG` con `en` o `es`.
+
 | Página | Para qué sirve |
 | --- | --- |
 | **Reglas** | Dominio o ruta → navegador, y si se quita el rastreo en esa regla. |
@@ -116,7 +119,7 @@ eliminarla. Después elige otro navegador predeterminado en la Configuración de
 
 Instala el sitio como app desde tu navegador Chromium (*Instalar app* / *Instalar este sitio como
 aplicación*). Switchman la encuentra en el menú Inicio y la muestra en **Navegadores**, así que puedes
-elegirla en una regla: `instagram.com` → **Instagram (app de Helium)**. Cada enlace se abre en una
+elegirla en una regla: `instagram.com` → **Instagram (Helium)**. Cada enlace se abre en una
 ventana nueva de esa app.
 
 Por dentro, la app se lanza así:

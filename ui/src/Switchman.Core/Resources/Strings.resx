@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="NavRules" xml:space="preserve"><value>Rules</value></data>
+  <data name="NavBrowsers" xml:space="preserve"><value>Browsers</value></data>
+  <data name="NavApps" xml:space="preserve"><value>Apps</value></data>
+  <data name="NavTest" xml:space="preserve"><value>Test link</value></data>
+  <data name="NavSettings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
+  <data name="StripTracking" xml:space="preserve"><value>Remove tracking parameters</value></data>
+  <data name="Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="No" xml:space="preserve"><value>No</value></data>
+  <data name="RulesIntro" xml:space="preserve"><value>Each rule sends the links of a domain (and optionally a path) to a browser or web app.</value></data>
+  <data name="RulesPattern" xml:space="preserve"><value>Domain or path (e.g. github.com or github.com/myorg)</value></data>
+  <data name="RulesTarget" xml:space="preserve"><value>Browser or web app</value></data>
+  <data name="RulesRemove" xml:space="preserve"><value>Remove rule</value></data>
+  <data name="RulesAdd" xml:space="preserve"><value>Add rule</value></data>
+  <data name="RulesNewTitle" xml:space="preserve"><value>New rule: type a domain</value></data>
+  <data name="RulesDefaultNote" xml:space="preserve"><value> · default browser: {0} (change it in Browsers)</value></data>
+  <data name="BrowsersIntro" xml:space="preserve"><value>The default browser opens links that match no rule. The fallback browser is used if config.json is missing or damaged.</value></data>
+  <data name="BrowsersDefault" xml:space="preserve"><value>Default browser</value></data>
+  <data name="BrowsersFallback" xml:space="preserve"><value>Fallback browser</value></data>
+  <data name="BrowsersDetected" xml:space="preserve"><value>Detected</value></data>
+  <data name="AppsIntro" xml:space="preserve"><value>Open links for these apps in their desktop app instead of the browser. Your rules take priority.</value></data>
+  <data name="AppsDetected" xml:space="preserve"><value>Detected apps</value></data>
+  <data name="AppsScan" xml:space="preserve"><value>Find apps</value></data>
+  <data name="AppsCustomTitle" xml:space="preserve"><value>Your own deep links</value></data>
+  <data name="AppsCustomIntro" xml:space="preserve"><value>For apps the catalog doesn't know: links to these domains open with the template. Placeholders: {url} {host} {path} {query}.</value></data>
+  <data name="AppsName" xml:space="preserve"><value>Name</value></data>
+  <data name="AppsScheme" xml:space="preserve"><value>Protocol (e.g. steam)</value></data>
+  <data name="AppsDomains" xml:space="preserve"><value>Domains (one per line)</value></data>
+  <data name="AppsTemplate" xml:space="preserve"><value>Template (e.g. steam://openurl/{url})</value></data>
+  <data name="AppsRemoveLink" xml:space="preserve"><value>Remove deep link</value></data>
+  <data name="AppsNewLink" xml:space="preserve"><value>New deep link</value></data>
+  <data name="AppsOtherTitle" xml:space="preserve"><value>Other installed protocols</value></data>
+  <data name="AppsOtherIntro" xml:space="preserve"><value>Apps that registered a protocol the catalog doesn't know. Pick one to create a deep link for it.</value></data>
+  <data name="AppsUseScheme" xml:space="preserve"><value>Create a deep link with this protocol</value></data>
+  <data name="AppsNotInstalled" xml:space="preserve"><value>In the catalog, not installed: {0}</value></data>
+  <data name="SettingsTrackingTitle" xml:space="preserve"><value>Tracking cleanup</value></data>
+  <data name="SettingsStripDescription" xml:space="preserve"><value>utm_*, fbclid, gclid, si and other campaign and social media identifiers.</value></data>
+  <data name="SettingsExtra" xml:space="preserve"><value>Extra parameters to remove</value></data>
+  <data name="SettingsExtraDescription" xml:space="preserve"><value>One per line. Added to the built-in list.</value></data>
+  <data name="SettingsDefaultTitle" xml:space="preserve"><value>Windows default browser</value></data>
+  <data name="SettingsDefaultCard" xml:space="preserve"><value>Default browser</value></data>
+  <data name="SettingsRegister" xml:space="preserve"><value>Register as default</value></data>
+  <data name="SettingsRegistryCard" xml:space="preserve"><value>Windows registration</value></data>
+  <data name="SettingsUnregister" xml:space="preserve"><value>Remove registration</value></data>
+  <data name="SettingsRegistered" xml:space="preserve"><value>Registered. In the Windows Settings page that just opened, find Switchman and click "Set default".</value></data>
+  <data name="SettingsUnregistered" xml:space="preserve"><value>Switchman is no longer registered as a browser</value></data>
+  <data name="SettingsIsDefault" xml:space="preserve"><value>Switchman is the default browser: links go through your rules.</value></data>
+  <data name="SettingsNotDefault" xml:space="preserve"><value>Switchman is not the default browser. Click "Register as default" and choose it in Windows Settings.</value></data>
+  <data name="SettingsRegisteredAt" xml:space="preserve"><value>Registered: {0}</value></data>
+  <data name="SettingsNotRegistered" xml:space="preserve"><value>Not registered for this user.</value></data>
+  <data name="TestIntro" xml:space="preserve"><value>Shows which browser would open the link and what it looks like without tracking parameters. Nothing is opened.</value></data>
+  <data name="TestLink" xml:space="preserve"><value>Link</value></data>
+  <data name="TestPlaceholder" xml:space="preserve"><value>https://example.com/?utm_source=...</value></data>
+  <data name="TestButton" xml:space="preserve"><value>Test</value></data>
+  <data name="TestOpensIn" xml:space="preserve"><value>Opens in</value></data>
+  <data name="TestRule" xml:space="preserve"><value>Rule applied</value></data>
+  <data name="TestClean" xml:space="preserve"><value>Clean link</value></data>
+  <data name="TestStripped" xml:space="preserve"><value>Parameters removed</value></data>
+  <data name="TestDeepLink" xml:space="preserve"><value>Deep link</value></data>
+  <data name="TestNoRuleApp" xml:space="preserve"><value>none (app deep link)</value></data>
+  <data name="TestNoRuleDefault" xml:space="preserve"><value>none (default browser)</value></data>
+  <data name="TestAppSuffix" xml:space="preserve"><value>{0} (app)</value></data>
+  <data name="TestNoDeepLink" xml:space="preserve"><value>none (opens in the browser)</value></data>
+  <data name="SaveSaved" xml:space="preserve"><value>Saved</value></data>
+  <data name="SaveNotSaved" xml:space="preserve"><value>Not saved</value></data>
+  <data name="SaveOverwritten" xml:space="preserve"><value>Saved (config.json was overwritten)</value></data>
+  <data name="SaveReloaded" xml:space="preserve"><value>config.json was reloaded; your changes were not saved</value></data>
+  <data name="ConflictTitle" xml:space="preserve"><value>config.json changed outside the app</value></data>
+  <data name="ConflictBody" xml:space="preserve"><value>Reload discards your changes. Overwrite saves your version on top (if the file was damaged, a .bak copy is kept).</value></data>
+  <data name="ConflictReload" xml:space="preserve"><value>Reload</value></data>
+  <data name="ConflictOverwrite" xml:space="preserve"><value>Overwrite</value></data>
+  <data name="ConflictCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="CliEmpty" xml:space="preserve"><value>empty response from switchman</value></data>
+  <data name="CliInvalid" xml:space="preserve"><value>invalid response from switchman: {0}</value></data>
+  <data name="CliExitCode" xml:space="preserve"><value>switchman exited with {0}</value></data>
+  <data name="CliTimeout" xml:space="preserve"><value>switchman did not respond in time</value></data>
+  <data name="ToggleOn" xml:space="preserve"><value>On</value></data>
+  <data name="ToggleOff" xml:space="preserve"><value>Off</value></data>
+</root>
