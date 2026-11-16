@@ -63,42 +63,40 @@ You can add your own in **Settings → Extra parameters to remove**.
 ## Installation
 
 **Requirements:** Windows 10 (1809) or Windows 11, 64-bit. Nothing else: .NET and the Windows App
-SDK ship inside the package.
+SDK ship inside the package. No administrator rights needed.
 
-1. Download `Switchman-<version>-win-x64.zip` from the
-   [latest release](../../releases/latest).
-2. Right-click the zip → **Properties** → tick **Unblock** → **OK**. Windows marks downloaded files,
-   and without this step PowerShell refuses to run the installer.
-3. Extract the zip, open a terminal in that folder and run:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\install.ps1
-   ```
-   The installer copies Switchman to `%LOCALAPPDATA%\Programs\Switchman`, adds it to the Start menu
-   and registers it as a browser. Windows **Settings → Default apps** opens at the end.
-4. Open **Switchman** from the Start menu, go to **Browsers**, pick your default browser
-   (and, optionally, a fallback) and click **Save**. Add any **Rules** you want.
-5. In **Settings → Default apps**, search for **Switchman** and click **Set default**. Windows
-   only lets you make this choice yourself; no app can do it for you.
+1. Download `Switchman-<version>-win-x64-setup.exe` from the [latest release](../../releases/latest)
+   and run it. It installs Switchman for your user in `%LOCALAPPDATA%\Programs\Switchman`, adds it
+   to the Start menu and registers it as a browser.
+2. On the last page, leave both boxes ticked: **Windows Settings** opens on Switchman's default-apps
+   page, and **Switchman** opens too.
+3. In Switchman, go to **Browsers**, pick your default browser (and, optionally, a fallback) and
+   click **Save**. Add any **Rules** you want.
+4. In Windows Settings, click **Set default** on Switchman. Windows only lets you make this choice
+   yourself; no app can do it for you.
 
 From now on every link goes through Switchman. The app's **Settings** page shows whether
 Switchman is the default browser.
 
-> **SmartScreen:** the executables are not code-signed yet, so Windows may show "Windows protected
+> **SmartScreen:** the installer is not code-signed yet, so Windows may show "Windows protected
 > your PC" the first time. Click **More info → Run anyway**.
 
 ### Updating
 
-Download the new release and run `install.ps1` again. Your configuration is kept.
+Run the setup of the new version. Your configuration is kept.
 
 ### Uninstalling
 
-```powershell
-powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\Programs\Switchman\install.ps1" -Uninstall
-```
+**Settings → Apps → Installed apps → Switchman → Uninstall**. This removes the registration, the
+Start menu shortcut and the program. Your configuration in `%LOCALAPPDATA%\Switchman` stays, in case
+you reinstall; delete that folder to remove it too. Then pick another default browser in Windows
+Settings.
 
-This removes the registration, the Start menu shortcut and the program folder. Your configuration
-in `%LOCALAPPDATA%\Switchman` stays, in case you reinstall. Delete that folder to remove it too.
-Then pick another default browser in Windows Settings.
+### Without the installer (zip)
+
+Each release also has `Switchman-<version>-win-x64.zip` with the same files and `install.ps1`.
+Right-click the zip → **Properties** → tick **Unblock**, extract it and run
+`powershell -ExecutionPolicy Bypass -File .\install.ps1` (add `-Uninstall` to remove it).
 
 ## Using it
 
@@ -172,7 +170,8 @@ switchman-cli reset-config              move a damaged config.json aside as conf
 switchman-cli set-fallback <ID>         set the fallback browser
 switchman-cli status                    registration and default-browser status
 switchman-cli apps                      deep link catalog, own deep links and other installed protocols
-switchman-cli register | unregister     register in / remove from Windows (HKCU)
+switchman-cli register [--quiet]        register in Windows (HKCU); opens Settings unless --quiet
+switchman-cli unregister                remove the registration
 ```
 
 Exit codes: `0` ok, `1` error, `2` usage, `3` damaged config, `4` config changed since it was read.
@@ -185,6 +184,7 @@ Requirements:
 - Visual Studio Build Tools 2026 with **Desktop development with C++**, **.NET desktop build tools**
   and **WinUI application development build tools**.
 - .NET 10 SDK.
+- [Inno Setup 6](https://jrsoftware.org/isinfo.php), only to build the installer (`winget install JRSoftware.InnoSetup`).
 
 ```powershell
 # Build and install from the source tree
@@ -195,16 +195,16 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 dotnet test ui\Switchman.slnx
 
-# Release zip -> target\dist\Switchman-<version>-win-x64.zip
+# Installer and zip -> target\dist\Switchman-<version>-win-x64-setup.exe and .zip
 powershell -ExecutionPolicy Bypass -File .\scripts\package.ps1
 ```
 
 ### Releasing
 
 Bump `version` in `Cargo.toml` (`[workspace.package]`) and push to `main`. The
-[Release workflow](.github/workflows/release.yml) builds on Windows, runs clippy and all tests, packages
-the zip and publishes release `v<version>`. If that tag already exists it does nothing. It can also be run
-by hand from **Actions → Release** with `dry_run` to get the zip as an artifact without publishing.
+[Release workflow](.github/workflows/release.yml) builds on Windows, runs clippy and all tests, builds
+the installer and the zip and publishes release `v<version>`. If that tag already exists it does nothing. It can also be run
+by hand from **Actions → Release** with `dry_run` to get both as an artifact without publishing.
 
 ### Layout
 
@@ -213,6 +213,7 @@ core/       Rust library: tracking cleanup, rule matching, config, browser detec
 cli/        switchman-cli.exe, the program registered as the browser
 ui/         WinUI 3 app (C#): Switchman.Core (view models, testable), Switchman.App, Switchman.Tests
 assets/     icon (SVG and ICO)
+installer/  Inno Setup script (per-user setup.exe, English and Spanish)
 scripts/    install.ps1 and package.ps1
 ```
 

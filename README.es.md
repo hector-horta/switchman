@@ -66,42 +66,40 @@ Puedes agregar los tuyos en **Ajustes → Parámetros extra a quitar**.
 ## Instalación
 
 **Requisitos:** Windows 10 (1809) o Windows 11, de 64 bits. Nada más: .NET y el Windows App SDK
-vienen incluidos en el paquete.
+vienen incluidos en el paquete. No necesita permisos de administrador.
 
-1. Descarga `Switchman-<versión>-win-x64.zip` desde la [última versión](../../releases/latest).
-2. Clic derecho en el zip → **Propiedades** → marca **Desbloquear** → **Aceptar**. Windows marca los
-   archivos descargados y, sin este paso, PowerShell no deja ejecutar el instalador.
-3. Descomprime el zip, abre una terminal en esa carpeta y ejecuta:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\install.ps1
-   ```
-   El instalador copia Switchman en `%LOCALAPPDATA%\Programs\Switchman`, lo agrega al menú Inicio y
-   lo registra como navegador. Al final se abre **Configuración → Aplicaciones predeterminadas**.
-4. Abre **Switchman** desde el menú Inicio, entra a **Navegadores**, elige tu navegador por defecto
-   (y, si quieres, uno de respaldo) y pulsa **Guardar**. Agrega las **Reglas** que quieras.
-5. En **Configuración → Aplicaciones predeterminadas**, busca **Switchman** y pulsa **Establecer
-   como predeterminado**. Windows solo deja que esa elección la hagas tú; ninguna app puede hacerla
-   por ti.
+1. Descarga `Switchman-<versión>-win-x64-setup.exe` desde la [última versión](../../releases/latest)
+   y ejecútalo. Instala Switchman para tu usuario en `%LOCALAPPDATA%\Programs\Switchman`, lo agrega
+   al menú Inicio y lo registra como navegador.
+2. En la última página deja marcadas las dos casillas: se abre la **Configuración de Windows** en la
+   ficha de aplicaciones predeterminadas de Switchman, y también **Switchman**.
+3. En Switchman, entra a **Navegadores**, elige tu navegador por defecto (y, si quieres, uno de
+   respaldo) y pulsa **Guardar**. Agrega las **Reglas** que quieras.
+4. En la Configuración de Windows, pulsa **Establecer como predeterminado** en Switchman. Windows solo
+   deja que esa elección la hagas tú; ninguna app puede hacerla por ti.
 
 Desde ese momento todos los enlaces pasan por Switchman. La página **Ajustes** de la app indica si
 Switchman es el navegador predeterminado.
 
-> **SmartScreen:** los ejecutables todavía no están firmados, así que la primera vez Windows puede
+> **SmartScreen:** el instalador todavía no está firmado, así que la primera vez Windows puede
 > mostrar "Windows protegió su PC". Pulsa **Más información → Ejecutar de todas formas**.
 
 ### Actualizar
 
-Descarga la nueva versión y vuelve a ejecutar `install.ps1`. Tu configuración se conserva.
+Ejecuta el instalador de la nueva versión. Tu configuración se conserva.
 
 ### Desinstalar
 
-```powershell
-powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\Programs\Switchman\install.ps1" -Uninstall
-```
-
-Quita el registro, el acceso directo del menú Inicio y la carpeta del programa. Tu configuración en
+**Configuración → Aplicaciones → Aplicaciones instaladas → Switchman → Desinstalar**. Quita el
+registro, el acceso directo del menú Inicio y el programa. Tu configuración en
 `%LOCALAPPDATA%\Switchman` se conserva por si reinstalas; borra esa carpeta si también quieres
 eliminarla. Después elige otro navegador predeterminado en la Configuración de Windows.
+
+### Sin instalador (zip)
+
+Cada versión trae también `Switchman-<versión>-win-x64.zip` con los mismos archivos e `install.ps1`.
+Clic derecho en el zip → **Propiedades** → marca **Desbloquear**, descomprímelo y ejecuta
+`powershell -ExecutionPolicy Bypass -File .\install.ps1` (con `-Uninstall` para quitarlo).
 
 ## Uso
 
@@ -176,7 +174,8 @@ switchman-cli reset-config              aparta un config.json dañado como confi
 switchman-cli set-fallback <ID>         fija el navegador de respaldo
 switchman-cli status                    estado del registro y del navegador predeterminado
 switchman-cli apps                      catálogo de deep links, deep links propios y otros protocolos instalados
-switchman-cli register | unregister     registra en Windows o quita el registro (HKCU)
+switchman-cli register [--quiet]        registra en Windows (HKCU); abre Configuración salvo con --quiet
+switchman-cli unregister                quita el registro
 ```
 
 Códigos de salida: `0` ok, `1` error, `2` uso incorrecto, `3` config dañada, `4` la config cambió
@@ -191,6 +190,7 @@ Requisitos:
   compilación para escritorio de .NET** y **Herramientas de compilación de desarrollo de aplicaciones
   de WinUI**.
 - SDK de .NET 10.
+- [Inno Setup 6](https://jrsoftware.org/isinfo.php), solo para armar el instalador (`winget install JRSoftware.InnoSetup`).
 
 ```powershell
 # Compilar e instalar desde el código
@@ -201,7 +201,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 dotnet test ui\Switchman.slnx
 
-# Zip del release -> target\dist\Switchman-<versión>-win-x64.zip
+# Instalador y zip -> target\dist\Switchman-<versión>-win-x64-setup.exe y .zip
 powershell -ExecutionPolicy Bypass -File .\scripts\package.ps1
 ```
 
@@ -209,8 +209,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\package.ps1
 
 Cambia `version` en `Cargo.toml` (`[workspace.package]`) y haz push a `main`. El
 [workflow Release](.github/workflows/release.yml) compila en Windows, corre clippy y todos los tests, arma
-el zip y publica el release `v<versión>`. Si ese tag ya existe, no hace nada. También se puede lanzar a mano
-desde **Actions → Release** con `dry_run`, que deja el zip como artefacto sin publicar.
+el instalador y el zip y publica el release `v<versión>`. Si ese tag ya existe, no hace nada. También se puede lanzar a mano
+desde **Actions → Release** con `dry_run`, que deja ambos como artefacto sin publicar.
 
 ### Estructura
 
@@ -219,6 +219,7 @@ core/       biblioteca Rust: limpieza de rastreo, reglas, config, detección de 
 cli/        switchman-cli.exe, el programa registrado como navegador
 ui/         app WinUI 3 (C#): Switchman.Core (ViewModels, testeable), Switchman.App, Switchman.Tests
 assets/     ícono (SVG e ICO)
+installer/  script de Inno Setup (setup.exe por usuario, en inglés y castellano)
 scripts/    install.ps1 y package.ps1
 ```
 

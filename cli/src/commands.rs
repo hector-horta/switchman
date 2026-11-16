@@ -82,12 +82,16 @@ pub fn set_fallback(id: &str) -> Result<()> {
     Ok(())
 }
 
-/// Registra este ejecutable como navegador predeterminado en Windows y abre la configuración del sistema.
-pub fn register() -> Result<()> {
+/// Registra este ejecutable como navegador en Windows y, si `open`, abre Configuración para elegirlo.
+pub fn register(open: bool) -> Result<()> {
     let exe = std::env::current_exe()?;
     registry::register(&exe)?;
     info!(exe = %exe.display(), "switchman registered");
-    open_settings()
+    if open {
+        open_settings()
+    } else {
+        Ok(())
+    }
 }
 
 /// Abre la Configuración de Windows en la ficha de Switchman con `ShellExecuteW`.
