@@ -145,9 +145,25 @@ interruptor; activado, sus enlaces web se traducen y se abren en la app:
 
 Tus reglas van primero, los parámetros de rastreo se quitan antes de traducir, y un enlace sin forma de app
 (por ejemplo `wa.me/message/…`) se abre en el navegador como siempre. **Buscar apps** vuelve a revisar el
-sistema: las apps del catálogo recién instaladas aparecen con su interruptor, y los demás protocolos
-instalados se listan para que crees tu propio deep link: dominios + una plantilla como
-`steam://openurl/{url}` (marcadores `{url}`, `{host}`, `{path}`, `{query}`).
+sistema: las apps del catálogo recién instaladas aparecen con su interruptor.
+
+#### Deep links propios
+
+Para una app que el catálogo no conoce, pulsa **Nuevo deep link**:
+
+1. **App**: elige su protocolo entre los instalados en tu equipo (o escríbelo). El nombre y una primera
+   plantilla se completan solos.
+2. **Dominios**: los sitios cuyos enlaces deben ir a la app, uno por línea (`store.steampowered.com`).
+   Incluye los subdominios.
+3. **Plantilla**: en qué se convierte cada enlace. **Pasar el enlace completo** pone `steam://{url}`;
+   **Cambiar https:// por el protocolo** pone `steam://{host}/{path}?{query}`. Ajústala a lo que espera la
+   app, por ejemplo `steam://openurl/{url}`. Marcadores: `{url}` el enlace completo, `{host}` el dominio,
+   `{path}` la ruta, `{query}` lo que va después del `?` (si está vacío, `?{query}` desaparece).
+4. **Prueba un enlace**: pega un enlace real para ver en qué se convierte, y **Probar en la app** lo abre
+   sin guardar. Los problemas aparecen bajo cada campo mientras escribes.
+
+Cada app tiene su propio formato de enlace y pocas lo documentan, así que probar es la forma de dar con la
+plantilla correcta.
 
 ### Archivos
 
@@ -174,6 +190,8 @@ switchman-cli reset-config              aparta un config.json dañado como confi
 switchman-cli set-fallback <ID>         fija el navegador de respaldo
 switchman-cli status                    estado del registro y del navegador predeterminado
 switchman-cli apps                      catálogo de deep links, deep links propios y otros protocolos instalados
+switchman-cli check-deeplink [--url U]  revisa un deep link (JSON por stdin) y en qué se convierte el enlace U
+switchman-cli open-uri <URI>            abre una URI en su app (solo protocolos registrados y no del sistema)
 switchman-cli register [--quiet]        registra en Windows (HKCU); abre Configuración salvo con --quiet
 switchman-cli unregister                quita el registro
 ```

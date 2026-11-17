@@ -26,6 +26,8 @@ internal sealed class FakeCli : ICliClient
 
     public CliResponse<AppsInfo> AppsReply { get; set; } = Fail<AppsInfo>(CliExit.Error, "sin respuesta");
 
+    public CliResponse<DeepLinkCheck> CheckReply { get; set; } = Ok(new DeepLinkCheck([], true, null));
+
     public List<string> Calls { get; } = [];
 
     public LinkConfig? LastSaved { get; private set; }
@@ -65,6 +67,18 @@ internal sealed class FakeCli : ICliClient
     {
         Calls.Add("apps");
         return Task.FromResult(AppsReply);
+    }
+
+    public Task<CliResponse<DeepLinkCheck>> CheckDeepLinkAsync(CustomDeepLink link, string? exampleUrl, CancellationToken ct)
+    {
+        Calls.Add("check-deeplink " + exampleUrl);
+        return Task.FromResult(CheckReply);
+    }
+
+    public Task<CliResponse<string>> OpenUriAsync(string uri, CancellationToken ct)
+    {
+        Calls.Add("open-uri " + uri);
+        return Task.FromResult(CommandReply);
     }
 
     public Task<CliResponse<AppStatus>> StatusAsync(CancellationToken ct)

@@ -16,5 +16,7 @@ namespace Switchman.Core.Cli;
 [JsonSerializable(typeof(AppStatus))]
 [JsonSerializable(typeof(SaveResult))]
 [JsonSerializable(typeof(AppsInfo))]
+[JsonSerializable(typeof(CustomDeepLink))]
+[JsonSerializable(typeof(DeepLinkCheck))]
 [JsonSerializable(typeof(IReadOnlyList<Browser>))]
 internal sealed partial class CliJsonContext : JsonSerializerContext;

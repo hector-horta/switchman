@@ -12,6 +12,8 @@ public interface ICliClient
     Task<CliResponse<RouteResult>> TestUrlAsync(string url, CancellationToken ct);
     Task<CliResponse<AppStatus>> StatusAsync(CancellationToken ct);
     Task<CliResponse<AppsInfo>> AppsAsync(CancellationToken ct);
+    Task<CliResponse<DeepLinkCheck>> CheckDeepLinkAsync(CustomDeepLink link, string? exampleUrl, CancellationToken ct);
+    Task<CliResponse<string>> OpenUriAsync(string uri, CancellationToken ct);
     Task<CliResponse<string>> SetFallbackAsync(string browserId, CancellationToken ct);
     Task<CliResponse<string>> RegisterAsync(CancellationToken ct);
     Task<CliResponse<string>> UnregisterAsync(CancellationToken ct);

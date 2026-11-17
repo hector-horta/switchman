@@ -2,6 +2,7 @@
 pub mod config;
 pub mod config_types;
 pub mod deeplink_apps;
+pub mod deeplink_check;
 pub mod deeplinks;
 pub mod detector;
 pub mod error;

@@ -31,6 +31,12 @@ public sealed class CliClient(IProcessRunner runner) : ICliClient
     public Task<CliResponse<AppsInfo>> AppsAsync(CancellationToken ct) =>
         CallAsync(["apps"], null, Json.AppsInfo, ct);
 
+    public Task<CliResponse<DeepLinkCheck>> CheckDeepLinkAsync(CustomDeepLink link, string? exampleUrl, CancellationToken ct) =>
+        CallAsync(exampleUrl is null ? ["check-deeplink"] : ["check-deeplink", "--url", exampleUrl],
+            JsonSerializer.Serialize(link, Json.CustomDeepLink), Json.DeepLinkCheck, ct);
+
+    public Task<CliResponse<string>> OpenUriAsync(string uri, CancellationToken ct) => RunAsync(["open-uri", uri], ct);
+
     public Task<CliResponse<string>> SetFallbackAsync(string browserId, CancellationToken ct) =>
         RunAsync(["set-fallback", browserId], ct);
 

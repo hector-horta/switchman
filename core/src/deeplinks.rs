@@ -4,8 +4,8 @@
 use crate::config::check_id;
 use crate::config_types::{Config, CustomDeepLink};
 use crate::deeplink_apps as apps;
+use crate::deeplink_check;
 use crate::error::{LinkError, Result};
-use crate::matcher::HostPattern;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use url::Url;
 
@@ -117,16 +117,23 @@ pub fn find_app(url: &Url) -> Option<&'static CatalogApp> {
 /// {url}: valor completo de la URL (ej: "https://wa.me/123").
 /// {host}: dominio del host (ej: "wa.me" o "discord.gg").
 /// {path}: parte de la ruta después de "/", sin el prefijo inicial.
-/// {query}: parámetros de consulta sin el `?` (ej: "token=abc"); vacío si no hay.
+/// {query}: parámetros de consulta sin el `?` (ej: "token=abc"); vacío si no hay, y entonces
+/// `?{query}` desaparece entero para no dejar un `?` suelto.
 pub fn apply_template(template: &str, url: &Url) -> String {
     let url_str = url.as_str();
     let host = url.host_str().unwrap_or("");
     let path = url.path().trim_start_matches('/');
+    let query = url.query().unwrap_or("");
+    let template = if query.is_empty() {
+        template.replace("?{query}", "")
+    } else {
+        template.to_string()
+    };
     template
         .replace("{url}", url_str)
         .replace("{host}", host)
         .replace("{path}", path)
-        .replace("{query}", url.query().unwrap_or(""))
+        .replace("{query}", query)
 }
 
 /// App que abre el enlace: deep links propios primero, después el catálogo si está activado e instalado.
@@ -153,21 +160,11 @@ pub fn target(config: &Config, url: &Url, registered: &dyn Fn(&str) -> bool) -> 
     })
 }
 
-/// Protocolos que un deep link propio no puede usar: abrirían el navegador o archivos locales.
-const FORBIDDEN_SCHEMES: &[&str] = &["http", "https", "file", "javascript", "vbscript", "data"];
-/// Límites de un deep link propio (frontera: vienen de config.json).
-const MAX_NAME: usize = 64;
-const MAX_SCHEME: usize = 32;
-const MAX_TEMPLATE: usize = 512;
-const MAX_DOMAINS: usize = 20;
-
 /// valida las apps activadas y los deep links propios de config.json.
 pub fn validate(config: &Config) -> Result<()> {
     for id in &config.app_links {
         if !CATALOG.iter().any(|app| app.id == id) {
-            return Err(LinkError::Config(format!(
-                "unknown deep link app: {id:?}"
-            )));
+            return Err(LinkError::Config(format!("unknown deep link app: {id:?}")));
         }
     }
 
@@ -178,63 +175,17 @@ pub fn validate(config: &Config) -> Result<()> {
     Ok(())
 }
 
-/// Valida un deep link personalizado según las reglas de configuración.
+/// Valida un deep link personalizado: id válido y ningún problema en sus campos.
 fn validate_custom(link: &CustomDeepLink) -> Result<()> {
-    let bad = |why: &str| {
-        Err(LinkError::Config(format!(
-            "deep link {:?}: {why}",
-            link.name
-        )))
-    };
-
     check_id("deep link", &link.id)?;
-
-    if link.name.trim().is_empty() || link.name.chars().count() > MAX_NAME {
-        return bad("name is empty or too long");
+    match deeplink_check::issues(link).first() {
+        Some(issue) => Err(LinkError::Config(format!(
+            "deep link {:?}: {}",
+            link.name,
+            issue.message()
+        ))),
+        None => Ok(()),
     }
-
-    if !valid_scheme(&link.scheme) {
-        return bad("invalid protocol");
-    }
-
-    if link.template.len() > MAX_TEMPLATE
-        || !link
-            .template
-            .to_ascii_lowercase()
-            .starts_with(&format!("{}:", link.scheme))
-    {
-        return bad("the template must start with its protocol");
-    }
-
-    if link.domains.is_empty() || link.domains.len() > MAX_DOMAINS {
-        return bad("between 1 and 20 domains are needed");
-    }
-
-    for domain in &link.domains {
-        if domain.contains('/') {
-            return bad("domains must not include a path");
-        }
-        HostPattern::parse(domain)?;
-    }
-
-    Ok(())
-}
-
-/// Verifica si el esquema es válido para un deep link propio.
-/// Debe cumplir: no estar vacío, longitud ≤ 32, primera letra minúscula ASCII,
-/// todos los caracteres son minúsculas ASCII, dígitos o '+', '-', '.',
-/// y no está en la lista de esquemas prohibidos.
-fn valid_scheme(scheme: &str) -> bool {
-    !scheme.is_empty()
-        && scheme.len() <= MAX_SCHEME
-        && scheme
-            .chars()
-            .next()
-            .is_some_and(|c| c.is_ascii_lowercase())
-        && scheme.chars().all(|c| {
-            c.is_ascii_lowercase() || c.is_ascii_digit() || c == '+' || c == '-' || c == '.'
-        })
-        && !FORBIDDEN_SCHEMES.contains(&scheme)
 }
 
 #[cfg(test)]

@@ -22,7 +22,7 @@ public sealed class AppsViewModelTests
     {
         _cli.GetConfigReplies.Enqueue(FakeCli.Ok(new VersionedConfig("rev1", new LinkConfig("edge", true, [], [], [], ["whatsapp", "zoom"], []))));
         _cli.AppsReply = FakeCli.Ok(Info);
-        var vm = new AppsViewModel(new ConfigSession(_cli, new FakeDialogs()), _cli);
+        var vm = new AppsViewModel(new ConfigSession(_cli, new FakeDialogs()), _cli) { PreviewDelay = TimeSpan.Zero };
         await vm.LoadCommand.ExecuteAsync(null);
         return vm;
     }
@@ -51,15 +51,14 @@ public sealed class AppsViewModelTests
     }
 
     [Fact]
-    public async Task UseSchemeCreatesADraftLink()
+    public async Task SelectingALinkOpensItsEditor()
     {
         var vm = await LoadedAsync();
-        vm.SelectedScheme = "steam";
-        vm.UseSchemeCommand.Execute(null);
-        var link = Assert.Single(vm.CustomLinks);
-        Assert.Equal("steam", link.Scheme);
-        Assert.Equal("steam://{url}", link.Template);
-        Assert.Same(link, vm.SelectedLink);
+        vm.AddLinkCommand.Execute(null);
+        Assert.NotNull(vm.Editor);
+        Assert.Same(vm.SelectedLink, vm.Editor.Link);
+        vm.SelectedLink = null;
+        Assert.Null(vm.Editor);
     }
 
     [Fact]
@@ -85,7 +84,7 @@ public sealed class AppsViewModelTests
     {
         _cli.GetConfigReplies.Enqueue(FakeCli.Ok(new VersionedConfig("rev1", LinkConfig.Empty)));
         _cli.AppsReply = FakeCli.Fail<AppsInfo>(CliExit.Error, "falló apps");
-        var vm = new AppsViewModel(new ConfigSession(_cli, new FakeDialogs()), _cli);
+        var vm = new AppsViewModel(new ConfigSession(_cli, new FakeDialogs()), _cli) { PreviewDelay = TimeSpan.Zero };
         await vm.LoadCommand.ExecuteAsync(null);
         Assert.Equal("falló apps", vm.Message);
         Assert.Equal(MessageKind.Error, vm.MessageKind);

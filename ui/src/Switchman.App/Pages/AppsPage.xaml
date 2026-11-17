@@ -65,7 +65,7 @@
 
             <TextBlock Margin="0,0,0,8" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                       TextWrapping="Wrap"
-                      Text="{x:Bind res:Strings.AppsCustomIntro, Mode=OneTime}" />
+                      Text="{x:Bind res:Strings.DlIntro, Mode=OneTime}" />
 
             <Grid ColumnSpacing="16">
                 <Grid.ColumnDefinitions>
@@ -93,15 +93,49 @@
                 <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="{ThemeResource OverlayCornerRadius}" Padding="16" VerticalAlignment="Top"
                         Visibility="{x:Bind ViewModel.HasSelection}">
                     <StackPanel Spacing="12">
-                        <TextBox Header="{x:Bind res:Strings.AppsName, Mode=OneTime}" Text="{x:Bind ViewModel.SelectedLink.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBox Header="{x:Bind res:Strings.AppsScheme, Mode=OneTime}" Text="{x:Bind ViewModel.SelectedLink.Scheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBox Header="{x:Bind res:Strings.AppsDomains, Mode=OneTime}"
-                                 AcceptsReturn="True" MinHeight="72"
-                                 Text="{x:Bind ViewModel.SelectedLink.DomainsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBox Header="{x:Bind res:Strings.AppsTemplate, Mode=OneTime}"
-                                 Text="{x:Bind ViewModel.SelectedLink.Template, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <Button Content="{x:Bind res:Strings.AppsRemoveLink, Mode=OneTime}" Command="{x:Bind ViewModel.RemoveLinkCommand}"
-                                CommandParameter="{x:Bind ViewModel.SelectedLink}" />
+                        <StackPanel Spacing="4">
+                            <ComboBox Header="{x:Bind res:Strings.DlApp, Mode=OneTime}" PlaceholderText="{x:Bind res:Strings.DlAppPlaceholder, Mode=OneTime}"
+                                      IsEditable="True" HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModel.OtherSchemes}"
+                                      Text="{x:Bind ViewModel.Editor.Link.Scheme, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap"
+                                       Text="{x:Bind ViewModel.Editor.SchemeError}" Visibility="{x:Bind app:Ui.VisibleIfText(ViewModel.Editor.SchemeError)}" />
+                        </StackPanel>
+                        <StackPanel Spacing="4">
+                            <TextBox Header="{x:Bind res:Strings.AppsName, Mode=OneTime}" Text="{x:Bind ViewModel.Editor.Link.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap"
+                                       Text="{x:Bind ViewModel.Editor.NameError}" Visibility="{x:Bind app:Ui.VisibleIfText(ViewModel.Editor.NameError)}" />
+                        </StackPanel>
+                        <StackPanel Spacing="4">
+                            <TextBox Header="{x:Bind res:Strings.AppsDomains, Mode=OneTime}" AcceptsReturn="True" MinHeight="72"
+                                     Text="{x:Bind ViewModel.Editor.Link.DomainsText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap"
+                                       Text="{x:Bind ViewModel.Editor.DomainsError}" Visibility="{x:Bind app:Ui.VisibleIfText(ViewModel.Editor.DomainsError)}" />
+                        </StackPanel>
+                        <StackPanel Spacing="4">
+                            <TextBox Header="{x:Bind res:Strings.AppsTemplate, Mode=OneTime}" Text="{x:Bind ViewModel.Editor.Link.Template, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <StackPanel>
+                                <HyperlinkButton Content="{x:Bind res:Strings.DlPresetWhole, Mode=OneTime}" Command="{x:Bind ViewModel.Editor.UseWholeLinkCommand}" />
+                                <HyperlinkButton Content="{x:Bind res:Strings.DlPresetReplace, Mode=OneTime}" Command="{x:Bind ViewModel.Editor.UseReplaceSchemeCommand}" />
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                                       Text="{x:Bind res:Strings.DlTemplateHelp, Mode=OneTime}" />
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap"
+                                       Text="{x:Bind ViewModel.Editor.TemplateError}" Visibility="{x:Bind app:Ui.VisibleIfText(ViewModel.Editor.TemplateError)}" />
+                        </StackPanel>
+                        <Border Height="1" Margin="0,4" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <StackPanel Spacing="4">
+                            <TextBox Header="{x:Bind res:Strings.DlExample, Mode=OneTime}" Text="{x:Bind ViewModel.Editor.ExampleUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       Text="{x:Bind res:Strings.DlOpensAs, Mode=OneTime}" Visibility="{x:Bind app:Ui.VisibleIfText(ViewModel.Editor.PreviewUri)}" />
+                            <TextBlock FontFamily="Consolas" IsTextSelectionEnabled="True" TextWrapping="Wrap" Text="{x:Bind ViewModel.Editor.PreviewUri}" />
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource SystemFillColorCautionBrush}" TextWrapping="Wrap"
+                                       Text="{x:Bind ViewModel.Editor.PreviewNote}" Visibility="{x:Bind app:Ui.VisibleIfText(ViewModel.Editor.PreviewNote)}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Content="{x:Bind res:Strings.DlTry, Mode=OneTime}" Command="{x:Bind ViewModel.Editor.TryCommand}" />
+                            <Button Content="{x:Bind res:Strings.AppsRemoveLink, Mode=OneTime}" Command="{x:Bind ViewModel.RemoveLinkCommand}"
+                                    CommandParameter="{x:Bind ViewModel.SelectedLink}" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -109,21 +143,6 @@
             <Button Margin="0,8,0,0" Content="{x:Bind res:Strings.AppsNewLink, Mode=OneTime}"
                     Command="{x:Bind ViewModel.AddLinkCommand}" />
 
-            <controls:SettingsExpander Margin="0,24,0,0" Header="{x:Bind res:Strings.AppsOtherTitle, Mode=OneTime}"
-                                       Description="{x:Bind res:Strings.AppsOtherIntro, Mode=OneTime}">
-                <controls:SettingsExpander.HeaderIcon>
-                    <FontIcon Glyph="&#xE71D;" />
-                </controls:SettingsExpander.HeaderIcon>
-                <controls:SettingsExpander.Items>
-                    <controls:SettingsCard ContentAlignment="Vertical" HorizontalContentAlignment="Stretch">
-                        <StackPanel Spacing="8">
-                            <ListView MaxHeight="200" ItemsSource="{x:Bind ViewModel.OtherSchemes}"
-                                      SelectedItem="{x:Bind ViewModel.SelectedScheme, Mode=TwoWay}" />
-                            <Button Content="{x:Bind res:Strings.AppsUseScheme, Mode=OneTime}" Command="{x:Bind ViewModel.UseSchemeCommand}" />
-                        </StackPanel>
-                    </controls:SettingsCard>
-                </controls:SettingsExpander.Items>
-            </controls:SettingsExpander>
         </StackPanel>
     </ScrollViewer>
 </Page>

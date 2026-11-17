@@ -8,14 +8,21 @@ use switchman_core::error::{LinkError, Result};
 use switchman_core::{paths, registry, revision, store};
 use tracing::info;
 
-/// Tamaño máximo aceptado por stdin para `set-config`.
+/// Tamaño máximo aceptado por stdin (`set-config`, `check-deeplink`).
 const MAX_STDIN: u64 = 1024 * 1024;
 
 /// Serializa `value` a JSON y lo imprime en una línea.
-fn print_json(value: &impl serde::Serialize) -> Result<()> {
+pub(crate) fn print_json(value: &impl serde::Serialize) -> Result<()> {
     let text = serde_json::to_string(value).map_err(|e| LinkError::Config(e.to_string()))?;
     println!("{text}");
     Ok(())
+}
+
+/// Lee de stdin (con tope) un JSON de tipo `T`.
+pub(crate) fn read_stdin_json<T: serde::de::DeserializeOwned>() -> Result<T> {
+    let mut text = String::new();
+    std::io::stdin().take(MAX_STDIN).read_to_string(&mut text)?;
+    serde_json::from_str(&text).map_err(|e| LinkError::Config(e.to_string()))
 }
 
 /// Imprime la versión y el contenido del archivo de configuración actual.
@@ -26,10 +33,7 @@ pub fn get_config() -> Result<()> {
 
 /// Guarda la configuración JSON recibida por stdin con la versión esperada.
 pub fn set_config(expected_revision: &str) -> Result<()> {
-    let mut text = String::new();
-    std::io::stdin().take(MAX_STDIN).read_to_string(&mut text)?;
-    let config: Config =
-        serde_json::from_str(&text).map_err(|e| LinkError::Config(e.to_string()))?;
+    let config: Config = read_stdin_json()?;
     let revision = revision::save_versioned(&paths::config_path()?, &config, expected_revision)?;
     info!(%revision, "config saved from the UI");
     print_json(&json!({ "revision": revision }))

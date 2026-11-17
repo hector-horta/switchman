@@ -28,16 +28,12 @@
   <data name="AppsDetected" xml:space="preserve"><value>Detected apps</value></data>
   <data name="AppsScan" xml:space="preserve"><value>Find apps</value></data>
   <data name="AppsCustomTitle" xml:space="preserve"><value>Your own deep links</value></data>
-  <data name="AppsCustomIntro" xml:space="preserve"><value>For apps the catalog doesn't know: links to these domains open with the template. Placeholders: {url} {host} {path} {query}.</value></data>
   <data name="AppsName" xml:space="preserve"><value>Name</value></data>
   <data name="AppsScheme" xml:space="preserve"><value>Protocol (e.g. steam)</value></data>
   <data name="AppsDomains" xml:space="preserve"><value>Domains (one per line)</value></data>
   <data name="AppsTemplate" xml:space="preserve"><value>Template (e.g. steam://openurl/{url})</value></data>
   <data name="AppsRemoveLink" xml:space="preserve"><value>Remove deep link</value></data>
   <data name="AppsNewLink" xml:space="preserve"><value>New deep link</value></data>
-  <data name="AppsOtherTitle" xml:space="preserve"><value>Other installed protocols</value></data>
-  <data name="AppsOtherIntro" xml:space="preserve"><value>Apps that registered a protocol the catalog doesn't know. Pick one to create a deep link for it.</value></data>
-  <data name="AppsUseScheme" xml:space="preserve"><value>Create a deep link with this protocol</value></data>
   <data name="AppsNotInstalled" xml:space="preserve"><value>In the catalog, not installed: {0}</value></data>
   <data name="SettingsTrackingTitle" xml:space="preserve"><value>Tracking cleanup</value></data>
   <data name="SettingsStripDescription" xml:space="preserve"><value>utm_*, fbclid, gclid, si and other campaign and social media identifiers.</value></data>
@@ -82,4 +78,23 @@
   <data name="CliTimeout" xml:space="preserve"><value>switchman did not respond in time</value></data>
   <data name="ToggleOn" xml:space="preserve"><value>On</value></data>
   <data name="ToggleOff" xml:space="preserve"><value>Off</value></data>
+  <data name="DlIntro" xml:space="preserve"><value>A deep link opens the links of some domains in a desktop app instead of the browser. Example: with protocol steam, domain store.steampowered.com and template steam://openurl/{url}, the Steam store opens in Steam.</value></data>
+  <data name="DlApp" xml:space="preserve"><value>App (protocol installed on this PC)</value></data>
+  <data name="DlAppPlaceholder" xml:space="preserve"><value>Pick one or type it, e.g. steam</value></data>
+  <data name="DlTemplateHelp" xml:space="preserve"><value>{url} the whole link · {host} domain · {path} path · {query} what follows the ?</value></data>
+  <data name="DlPresetWhole" xml:space="preserve"><value>Pass the whole link</value></data>
+  <data name="DlPresetReplace" xml:space="preserve"><value>Replace https:// with the protocol</value></data>
+  <data name="DlExample" xml:space="preserve"><value>Try a link</value></data>
+  <data name="DlTry" xml:space="preserve"><value>Try in the app</value></data>
+  <data name="DlOpensAs" xml:space="preserve"><value>Opens in the app as:</value></data>
+  <data name="DlNameInvalid" xml:space="preserve"><value>Give it a name (up to 64 characters).</value></data>
+  <data name="DlSchemeInvalid" xml:space="preserve"><value>Use the protocol name only, lowercase, without :// (e.g. steam). http, https and file are not allowed.</value></data>
+  <data name="DlTemplateScheme" xml:space="preserve"><value>The template must start with {0}:</value></data>
+  <data name="DlTemplateTooLong" xml:space="preserve"><value>The template is too long (up to 512 characters).</value></data>
+  <data name="DlDomainsCount" xml:space="preserve"><value>Add between 1 and 20 domains.</value></data>
+  <data name="DlDomainPath" xml:space="preserve"><value>Domains only, without a path: store.steampowered.com, not store.steampowered.com/app.</value></data>
+  <data name="DlDomainInvalid" xml:space="preserve"><value>One of the domains is not valid.</value></data>
+  <data name="DlExampleInvalid" xml:space="preserve"><value>Type a link that starts with https://</value></data>
+  <data name="DlExampleNoMatch" xml:space="preserve"><value>This link is not from the domains above: Switchman would not send it to the app.</value></data>
+  <data name="DlNotInstalled" xml:space="preserve"><value>No app on this PC handles {0}: the deep link will not be used until one is installed.</value></data>
 </root>

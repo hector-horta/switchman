@@ -8,8 +8,8 @@ using Switchman.Core.Services;
 namespace Switchman.Core.ViewModels;
 
 /// <summary>
-/// Página Apps: interruptor por app del catálogo de deep links (WhatsApp, Discord…), deep links
-/// propios y los demás protocolos instalados, que se vuelven a buscar con "Buscar apps".
+/// Página Apps: interruptor por app del catálogo de deep links (WhatsApp, Discord…) y deep links
+/// propios. Los demás protocolos instalados se ofrecen al elegir la app de un deep link propio.
 /// </summary>
 public sealed partial class AppsViewModel(ConfigSession session, ICliClient cli) : PageViewModel
 {
@@ -35,23 +35,25 @@ public sealed partial class AppsViewModel(ConfigSession session, ICliClient cli)
 
     public bool HasSelection => SelectedLink is not null;
 
-    /// <summary>Protocolo elegido en "otros protocolos" para crear un deep link con él.</summary>
+    /// <summary>Editor del deep link propio seleccionado (errores por campo y vista previa).</summary>
     [ObservableProperty]
-    public partial string? SelectedScheme { get; set; }
+    public partial DeepLinkEditor? Editor { get; set; }
+
+    /// <summary>Espera tras el último cambio antes de revisar el deep link (en tests, cero).</summary>
+    public TimeSpan PreviewDelay { get; init; } = TimeSpan.FromMilliseconds(300);
 
     /// <summary>Agrega un deep link propio vacío y lo selecciona para editarlo.</summary>
     [RelayCommand]
     private void AddLink() => Select(new DeepLinkItem { Id = NextId() });
 
-    /// <summary>Crea un deep link propio con el protocolo elegido en "otros protocolos".</summary>
-    [RelayCommand]
-    private void UseScheme()
+    partial void OnSelectedLinkChanged(DeepLinkItem? value)
     {
-        if (string.IsNullOrWhiteSpace(SelectedScheme))
+        Editor?.Dispose();
+        Editor = value is null ? null : new DeepLinkEditor(_cli, value, PreviewDelay);
+        if (Editor is not null)
         {
-            return;
+            _ = Editor.RefreshAsync(CancellationToken.None);
         }
-        Select(new DeepLinkItem { Id = NextId(), Name = SelectedScheme, Scheme = SelectedScheme, Template = SelectedScheme + "://{url}" });
     }
 
     /// <summary>Quita un deep link propio (se aplica al guardar).</summary>

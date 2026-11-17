@@ -141,9 +141,24 @@ has a switch; when it is on, its web links are translated and opened in the app:
 
 Your rules come first, tracking parameters are removed before translating, and a link with no app form
 (for example `wa.me/message/…`) opens in the browser as usual. **Find apps** rescans the system: newly
-installed catalog apps get their switch, and every other installed protocol is listed so you can create
-your own deep link for it: domains + a template such as `steam://openurl/{url}` (placeholders `{url}`,
-`{host}`, `{path}`, `{query}`).
+installed catalog apps get their switch.
+
+#### Your own deep links
+
+For an app the catalog doesn't know, click **New deep link**:
+
+1. **App**: pick its protocol from the ones installed on your PC (or type it). The name and a first
+   template fill themselves in.
+2. **Domains**: the sites whose links should go to the app, one per line (`store.steampowered.com`).
+   Subdomains are included.
+3. **Template**: what each link turns into. **Pass the whole link** gives `steam://{url}`;
+   **Replace https:// with the protocol** gives `steam://{host}/{path}?{query}`. Adjust it to what the app
+   expects, e.g. `steam://openurl/{url}`. Placeholders: `{url}` the whole link, `{host}` the domain,
+   `{path}` the path, `{query}` what follows the `?` (an empty `?{query}` is dropped).
+4. **Try a link**: paste a real link to see what it opens as, and **Try in the app** to open it without
+   saving. Problems show up under each field as you type.
+
+Each app has its own link format and few document it, so trying is the way to find the right template.
 
 ### Files
 
@@ -170,6 +185,8 @@ switchman-cli reset-config              move a damaged config.json aside as conf
 switchman-cli set-fallback <ID>         set the fallback browser
 switchman-cli status                    registration and default-browser status
 switchman-cli apps                      deep link catalog, own deep links and other installed protocols
+switchman-cli check-deeplink [--url U]  check a deep link (JSON on stdin) and what link U turns into
+switchman-cli open-uri <URI>            open a URI in its app (registered, non-system protocols only)
 switchman-cli register [--quiet]        register in Windows (HKCU); opens Settings unless --quiet
 switchman-cli unregister                remove the registration
 ```

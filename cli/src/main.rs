@@ -10,7 +10,7 @@ use switchman_core::error::LinkError;
 use switchman_core::router;
 use tracing::error;
 
-const USAGE: &str = "usage: switchman-cli <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | apps | register [--quiet] | unregister>";
+const USAGE: &str = "usage: switchman-cli <open-url URL | test-url URL | detect | set-fallback ID | get-config | set-config --revision R | reset-config | status | apps | check-deeplink [--url URL] | open-uri URI | register [--quiet] | unregister>";
 
 /// Despacha el subcomando y devuelve 0 (ok), 1 (error) o 2 (uso incorrecto).
 fn main() -> ExitCode {
@@ -32,6 +32,9 @@ fn main() -> ExitCode {
         ("reset-config", []) => config_cmds::reset_config(),
         ("status", []) => config_cmds::status(),
         ("apps", []) => apps_cmds::apps(),
+        ("check-deeplink", []) => apps_cmds::check_deeplink(None),
+        ("check-deeplink", ["--url", url]) => apps_cmds::check_deeplink(Some(url)),
+        ("open-uri", [uri]) => apps_cmds::open_uri(uri),
         ("detect", []) => commands::detect(),
         ("register", []) => commands::register(true),
         // El instalador registra sin abrir Configuración (instalación silenciosa con winget).

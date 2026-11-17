@@ -27,3 +27,12 @@ public sealed record CustomDeepLinkInfo(string Id, string Name, string Scheme, I
 
 /// <summary>Salida de <c>apps</c>: catálogo, deep links propios y otros protocolos instalados.</summary>
 public sealed record AppsInfo(IReadOnlyList<CatalogAppInfo> Catalog, IReadOnlyList<CustomDeepLinkInfo> Custom, IReadOnlyList<string> OtherSchemes);
+
+/// <summary>Problema de un campo de un deep link propio: <see cref="Field"/> name, scheme, domains o template.</summary>
+public sealed record DeepLinkIssue(string Field, string Code);
+
+/// <summary>Enlace de ejemplo probado: si es válido, si lo captura el deep link y la URI resultante.</summary>
+public sealed record DeepLinkPreview(bool ValidUrl, bool Matches, string? Uri);
+
+/// <summary>Salida de <c>check-deeplink</c>.</summary>
+public sealed record DeepLinkCheck(IReadOnlyList<DeepLinkIssue> Issues, bool Installed, DeepLinkPreview? Preview);
