@@ -6,6 +6,7 @@ pub mod deeplink_check;
 pub mod deeplinks;
 pub mod detector;
 pub mod error;
+pub mod landing;
 pub mod launcher;
 pub mod matcher;
 pub mod paths;

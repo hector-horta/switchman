@@ -46,6 +46,9 @@ No network access, no telemetry, no account. Your configuration is a local JSON 
 - **Desktop apps by deep link**: links to WhatsApp, Discord, Teams, Telegram, Zoom, Slack, Spotify or Notion
   open in their desktop app (one switch per app), and you can add deep links for any other app that
   registers a protocol.
+- **Phone Link notifications**: tapping a phone notification on Windows goes through Switchman too.
+  WhatsApp opens in its desktop app, and Reddit's "download the app" page (`reddit.com/mobile/download`)
+  becomes the Reddit home page instead of a help article.
 - **Test without opening**: see which browser a link would go to and what the clean URL looks like.
 - **Edit-safe**: if `config.json` changes while the app is open (by hand or another window), the app
   asks whether to reload or overwrite instead of silently discarding either version.

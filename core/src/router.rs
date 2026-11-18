@@ -85,6 +85,10 @@ fn pick(config: &Config, url: &Url) -> (String, Option<String>, bool) {
 /// Determina el navegador y la URL final para un enlace entrante según la configuración disponible.
 pub fn decide(loaded: &Loaded, browsers: &[Browser], raw: &str) -> Result<Decision> {
     let mut url = parse_link(raw)?;
+    // Página de "descarga la app" (Phone Link): se abre la portada y las reglas deciden dónde.
+    if let Some(home) = crate::landing::rewrite(&url) {
+        url = home;
+    }
     match loaded {
         Loaded::Fallback(browser) => {
             let stripped = strip_tracking(&mut url, &[]);

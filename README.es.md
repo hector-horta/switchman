@@ -49,6 +49,9 @@ Sin acceso a la red, sin telemetría, sin cuentas. Tu configuración es un archi
 - **Apps de escritorio por deep link**: los enlaces de WhatsApp, Discord, Teams, Telegram, Zoom, Slack, Spotify o
   Notion se abren en su app de escritorio (un interruptor por app), y puedes agregar deep links para cualquier
   otra app que registre un protocolo.
+- **Notificaciones de Phone Link**: tocar en Windows una notificación del teléfono también pasa por
+  Switchman. WhatsApp se abre en su app de escritorio, y la página "descarga la app" de Reddit
+  (`reddit.com/mobile/download`) se cambia por la portada de Reddit en vez de un artículo de ayuda.
 - **Probar sin abrir**: muestra a qué navegador iría un enlace y cómo queda limpio.
 - **Ediciones a salvo**: si `config.json` cambia con la app abierta (a mano o desde otra ventana),
   la app pregunta si recargar o sobrescribir, en vez de descartar en silencio una de las versiones.
