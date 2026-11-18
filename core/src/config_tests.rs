@@ -27,6 +27,7 @@ fn sample() -> Config {
         extra_tracking_params: vec![],
         app_links: vec![],
         custom_deeplinks: vec![],
+        redirects: vec![],
     }
 }
 

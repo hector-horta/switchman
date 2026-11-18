@@ -43,6 +43,11 @@
                         <FontIcon Glyph="&#xE71C;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="{x:Bind res:Strings.NavRedirects, Mode=OneTime}" Tag="redirects">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8AB;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="{x:Bind res:Strings.NavBrowsers, Mode=OneTime}" Tag="browsers">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE774;" />

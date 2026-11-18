@@ -66,8 +66,8 @@ pub fn route(raw: &str) -> Result<router::Decision> {
         Err(LinkError::BrowserNotFound(_)) => full_route(&loaded, raw)?,
         other => other?,
     };
-    // Sin regla que aplique: si el enlace es de una app activada e instalada, se abre en la app.
-    if let (None, Loaded::Config(config)) = (&decision.rule_id, &loaded) {
+    // Sin regla ni redirección a una app: si el enlace es de una app activada e instalada, se abre en ella.
+    if let (None, None, Loaded::Config(config)) = (&decision.rule_id, &decision.app, &loaded) {
         decision.app = deeplinks::target(config, &decision.url, &protocols::scheme_registered);
     }
 

@@ -49,9 +49,9 @@ Sin acceso a la red, sin telemetría, sin cuentas. Tu configuración es un archi
 - **Apps de escritorio por deep link**: los enlaces de WhatsApp, Discord, Teams, Telegram, Zoom, Slack, Spotify o
   Notion se abren en su app de escritorio (un interruptor por app), y puedes agregar deep links para cualquier
   otra app que registre un protocolo.
-- **Notificaciones de Phone Link**: tocar en Windows una notificación del teléfono también pasa por
-  Switchman. WhatsApp se abre en su app de escritorio, y la página "descarga la app" de Reddit
-  (`reddit.com/mobile/download`) se cambia por la portada de Reddit en vez de un artículo de ayuda.
+- **Redirecciones**: abren un enlace como otro antes de tus reglas, p. ej. una página de "descarga nuestra
+  app" como la portada del sitio, o una portada como su app de escritorio (`whatsapp://`). Útil para las
+  notificaciones del teléfono en Windows (Phone Link), que solo mandan un enlace genérico por app.
 - **Probar sin abrir**: muestra a qué navegador iría un enlace y cómo queda limpio.
 - **Ediciones a salvo**: si `config.json` cambia con la app abierta (a mano o desde otra ventana),
   la app pregunta si recargar o sobrescribir, en vez de descartar en silencio una de las versiones.
@@ -112,6 +112,7 @@ variable de entorno `SWITCHMAN_LANG` con `en` o `es`.
 | Página | Para qué sirve |
 | --- | --- |
 | **Reglas** | Dominio o ruta → navegador, y si se quita el rastreo en esa regla. |
+| **Redirecciones** | Enlace a capturar → enlace o app con que se abre. Van antes de las reglas. |
 | **Navegadores** | Navegador por defecto (enlaces sin regla) y de respaldo (si `config.json` falta o está dañado). |
 | **Probar enlace** | Pega un enlace y ve el navegador, la regla aplicada y el enlace limpio. No abre nada. |
 | **Ajustes** | Limpieza de rastreo, parámetros extra y el estado del navegador predeterminado de Windows. |
@@ -168,13 +169,29 @@ Para una app que el catálogo no conoce, pulsa **Nuevo deep link**:
 Cada app tiene su propio formato de enlace y pocas lo documentan, así que probar es la forma de dar con la
 plantilla correcta.
 
+### Redirecciones
+
+Una redirección abre un enlace como otro, una sola vez y antes de tus reglas. **Enlace a capturar** funciona
+como el patrón de una regla: un dominio (incluye subdominios) y una ruta opcional
+(`reddit.com/mobile/download`). Si termina en `/` y sin ruta (`www.whatsapp.com/`), captura solo la portada.
+**Abrir como** es otro enlace (`https://www.reddit.com/`), que después pasa por tus reglas, o la URI de una
+app (`whatsapp://`); si la app no responde, el enlace original se abre en el navegador.
+
+Switchman trae una, que puedes editar o borrar: `reddit.com/mobile/download` → `https://www.reddit.com/`.
+Reddit no tiene app para Windows, así que esa página de "descarga la app" solo lleva a un artículo de ayuda.
+
+| Capturar | Abrir como | Para qué |
+| --- | --- | --- |
+| `reddit.com/mobile/download` | `https://www.reddit.com/` | Las notificaciones de Reddit en Windows llegan a la portada |
+| `www.whatsapp.com/` | `whatsapp://` | La portada de WhatsApp (lo que abre Phone Link) abre la app |
+
 ### Archivos
 
 Todo vive en `%LOCALAPPDATA%\Switchman`:
 
 | Archivo | Contenido |
 | --- | --- |
-| `config.json` | Reglas, navegador por defecto, opciones de limpieza y navegadores personalizados. |
+| `config.json` | Reglas, redirecciones, navegador por defecto, opciones de limpieza, deep links y navegadores personalizados. |
 | `fallback.json` | Navegador a usar si `config.json` no se puede leer. |
 | `switchman.log` | Una línea por enlace abierto: dominio, navegador o app, regla y si se limpió (nunca la URL completa). |
 | `switchman-ui.log` | Eventos y errores de la app. |

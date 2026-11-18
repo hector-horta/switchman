@@ -46,9 +46,9 @@ No network access, no telemetry, no account. Your configuration is a local JSON 
 - **Desktop apps by deep link**: links to WhatsApp, Discord, Teams, Telegram, Zoom, Slack, Spotify or Notion
   open in their desktop app (one switch per app), and you can add deep links for any other app that
   registers a protocol.
-- **Phone Link notifications**: tapping a phone notification on Windows goes through Switchman too.
-  WhatsApp opens in its desktop app, and Reddit's "download the app" page (`reddit.com/mobile/download`)
-  becomes the Reddit home page instead of a help article.
+- **Redirects**: open a link as another one before your rules, e.g. a "download our app" page as the
+  site's home page, or a home page as its desktop app (`whatsapp://`). Handy for phone notifications
+  shown on Windows (Phone Link), which only send a generic link per app.
 - **Test without opening**: see which browser a link would go to and what the clean URL looks like.
 - **Edit-safe**: if `config.json` changes while the app is open (by hand or another window), the app
   asks whether to reload or overwrite instead of silently discarding either version.
@@ -109,6 +109,7 @@ the `SWITCHMAN_LANG` environment variable to `en` or `es`.
 | Page | What it is for |
 | --- | --- |
 | **Rules** | Domain or path → browser, and whether to strip tracking for that rule. |
+| **Redirects** | Link to catch → link or app to open instead. Applied before the rules. |
 | **Browsers** | Default browser (links with no rule) and fallback browser (used if `config.json` is missing or damaged). |
 | **Test link** | Paste a link and see the browser, the rule applied and the clean URL. Nothing is opened. |
 | **Settings** | Tracking cleanup on/off, extra parameters, and the Windows default-browser status. |
@@ -163,13 +164,29 @@ For an app the catalog doesn't know, click **New deep link**:
 
 Each app has its own link format and few document it, so trying is the way to find the right template.
 
+### Redirects
+
+A redirect opens a link as another one, once and before your rules. **Link to catch** works like a rule
+pattern: a domain (subdomains included) and an optional path (`reddit.com/mobile/download`). Ending with
+`/` and no path (`www.whatsapp.com/`) catches only the home page. **Open as** is another link
+(`https://www.reddit.com/`), which then goes through your rules, or an app URI (`whatsapp://`); if the app
+doesn't respond, the original link opens in the browser.
+
+Switchman ships with one, which you can edit or delete: `reddit.com/mobile/download` → `https://www.reddit.com/`.
+Reddit has no Windows app, so that "download the app" page only leads to a help article.
+
+| Catch | Open as | What for |
+| --- | --- | --- |
+| `reddit.com/mobile/download` | `https://www.reddit.com/` | Reddit notifications on Windows land on the home page |
+| `www.whatsapp.com/` | `whatsapp://` | WhatsApp's home page (what Phone Link opens) opens the app |
+
 ### Files
 
 Everything lives in `%LOCALAPPDATA%\Switchman`:
 
 | File | Content |
 | --- | --- |
-| `config.json` | Rules, default browser, cleanup options, custom browsers. |
+| `config.json` | Rules, redirects, default browser, cleanup options, deep links, custom browsers. |
 | `fallback.json` | Browser to use if `config.json` cannot be read. |
 | `switchman.log` | One line per opened link: domain, browser or app, rule, whether it was cleaned (never the full URL). |
 | `switchman-ui.log` | App events and errors. |

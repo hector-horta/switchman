@@ -57,6 +57,7 @@ pub fn validate(config: &Config) -> Result<()> {
             return Err(LinkError::Config(format!("empty path for {}", b.id)));
         }
     }
+    crate::redirects::validate(config)?;
     crate::deeplinks::validate(config)
 }
 

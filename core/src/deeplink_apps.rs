@@ -18,7 +18,7 @@ fn param(url: &Url, key: &str) -> Option<String> {
 }
 
 /// WhatsApp: `wa.me/<número>` y `api.whatsapp.com/send` → chat; `chat.whatsapp.com/<código>` → grupo.
-/// La portada (`www.whatsapp.com/`) y `web.whatsapp.com` abren la app sin chat.
+/// `web.whatsapp.com` abre la app sin chat; la portada (`www.whatsapp.com/`) es una página web más.
 /// `wa.me/message/…` (WhatsApp Business) no trae el número: `None`.
 pub fn whatsapp(url: &Url) -> Option<String> {
     let host = url.host_str()?.to_ascii_lowercase();
@@ -26,10 +26,6 @@ pub fn whatsapp(url: &Url) -> Option<String> {
     let phone = match host.as_str() {
         "chat.whatsapp.com" => return Some(format!("whatsapp://chat?code={}", enc(segs.first()?))),
         "web.whatsapp.com" => return Some("whatsapp://".to_string()),
-        // Portada: es lo que abre Phone Link al tocar una notificación de WhatsApp.
-        "whatsapp.com" | "www.whatsapp.com" if segs.is_empty() => {
-            return Some("whatsapp://".to_string())
-        }
         "wa.me" => match segs.first()? {
             &"message" => return None,
             first => Some((*first).to_string()),

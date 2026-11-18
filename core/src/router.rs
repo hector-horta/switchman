@@ -1,8 +1,10 @@
 //! Decide el navegador y la URL final para un enlace entrante.
 use crate::config::{Browser, Loaded};
 use crate::config_types::Config;
+use crate::deeplinks::AppTarget;
 use crate::error::{LinkError, Result};
 use crate::matcher::HostPattern;
+use crate::redirects::Target;
 use crate::sanitizer::strip_tracking;
 use url::Url;
 
@@ -17,7 +19,7 @@ pub struct Decision {
     pub rule_id: Option<String>,
     pub stripped: bool,
     /// App de escritorio que abre el enlace por deep link (lo completa el CLI); si es `None`, el navegador.
-    pub app: Option<crate::deeplinks::AppTarget>,
+    pub app: Option<AppTarget>,
 }
 
 /// Convierte una cadena de enlace en una URL válida con validaciones básicas.
@@ -85,10 +87,6 @@ fn pick(config: &Config, url: &Url) -> (String, Option<String>, bool) {
 /// Determina el navegador y la URL final para un enlace entrante según la configuración disponible.
 pub fn decide(loaded: &Loaded, browsers: &[Browser], raw: &str) -> Result<Decision> {
     let mut url = parse_link(raw)?;
-    // Página de "descarga la app" (Phone Link): se abre la portada y las reglas deciden dónde.
-    if let Some(home) = crate::landing::rewrite(&url) {
-        url = home;
-    }
     match loaded {
         Loaded::Fallback(browser) => {
             let stripped = strip_tracking(&mut url, &[]);
@@ -101,6 +99,20 @@ pub fn decide(loaded: &Loaded, browsers: &[Browser], raw: &str) -> Result<Decisi
             })
         }
         Loaded::Config(config) => {
+            // Redirección configurada: otro enlace (sigue por las reglas) o la URI de una app.
+            let mut app = None;
+            match crate::redirects::apply(config, &url) {
+                Some(Target::Link(to)) => url = to,
+                Some(Target::App(uri)) => {
+                    let name = uri.split(':').next().unwrap_or_default().to_string();
+                    app = Some(AppTarget {
+                        id: "redirect".into(),
+                        name,
+                        uri,
+                    });
+                }
+                None => {}
+            }
             let (browser_id, rule_id, strip) = pick(config, &url);
             let browser = browsers
                 .iter()
@@ -113,7 +125,7 @@ pub fn decide(loaded: &Loaded, browsers: &[Browser], raw: &str) -> Result<Decisi
                 url,
                 rule_id,
                 stripped,
-                app: None,
+                app,
             })
         }
     }

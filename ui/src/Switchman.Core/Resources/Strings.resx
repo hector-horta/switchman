@@ -97,4 +97,12 @@
   <data name="DlExampleInvalid" xml:space="preserve"><value>Type a link that starts with https://</value></data>
   <data name="DlExampleNoMatch" xml:space="preserve"><value>This link is not from the domains above: Switchman would not send it to the app.</value></data>
   <data name="DlNotInstalled" xml:space="preserve"><value>No app on this PC handles {0}: the deep link will not be used until one is installed.</value></data>
+  <data name="NavRedirects" xml:space="preserve"><value>Redirects</value></data>
+  <data name="RedirectsIntro" xml:space="preserve"><value>A redirect opens a link as another one, before your rules. Useful for pages that don't make sense on a computer, such as "download our app" pages. The destination can be another link (https://…) or an app (whatsapp://).</value></data>
+  <data name="RedirectsFrom" xml:space="preserve"><value>Link to catch (domain and optional path, e.g. reddit.com/mobile/download)</value></data>
+  <data name="RedirectsFromHelp" xml:space="preserve"><value>Like a rule, it includes subdomains and everything under the path. End with / and no path (www.whatsapp.com/) to catch only the home page.</value></data>
+  <data name="RedirectsTo" xml:space="preserve"><value>Open as (https://… link or app, e.g. https://www.reddit.com/ or whatsapp://)</value></data>
+  <data name="RedirectsAdd" xml:space="preserve"><value>Add redirect</value></data>
+  <data name="RedirectsRemove" xml:space="preserve"><value>Remove redirect</value></data>
+  <data name="RedirectsNewTitle" xml:space="preserve"><value>New redirect: type a link</value></data>
 </root>

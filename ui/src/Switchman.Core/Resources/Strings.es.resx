@@ -97,4 +97,12 @@
   <data name="DlExampleInvalid" xml:space="preserve"><value>Escribe un enlace que empiece con https://</value></data>
   <data name="DlExampleNoMatch" xml:space="preserve"><value>Este enlace no es de los dominios de arriba: Switchman no lo enviaría a la app.</value></data>
   <data name="DlNotInstalled" xml:space="preserve"><value>Ninguna app de este equipo atiende {0}: el deep link no se usará hasta que haya una instalada.</value></data>
+  <data name="NavRedirects" xml:space="preserve"><value>Redirecciones</value></data>
+  <data name="RedirectsIntro" xml:space="preserve"><value>Una redirección abre un enlace como otro, antes de tus reglas. Sirve para páginas que no tienen sentido en el computador, como las de "descarga nuestra app". El destino puede ser otro enlace (https://…) o una app (whatsapp://).</value></data>
+  <data name="RedirectsFrom" xml:space="preserve"><value>Enlace a capturar (dominio y ruta opcional, p. ej. reddit.com/mobile/download)</value></data>
+  <data name="RedirectsFromHelp" xml:space="preserve"><value>Como en una regla, incluye los subdominios y todo lo que cuelga de la ruta. Termina en / y sin ruta (www.whatsapp.com/) para capturar solo la portada.</value></data>
+  <data name="RedirectsTo" xml:space="preserve"><value>Abrir como (enlace https://… o app, p. ej. https://www.reddit.com/ o whatsapp://)</value></data>
+  <data name="RedirectsAdd" xml:space="preserve"><value>Agregar redirección</value></data>
+  <data name="RedirectsRemove" xml:space="preserve"><value>Quitar redirección</value></data>
+  <data name="RedirectsNewTitle" xml:space="preserve"><value>Nueva redirección: escribe un enlace</value></data>
 </root>

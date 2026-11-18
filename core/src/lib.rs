@@ -6,12 +6,12 @@ pub mod deeplink_check;
 pub mod deeplinks;
 pub mod detector;
 pub mod error;
-pub mod landing;
 pub mod launcher;
 pub mod matcher;
 pub mod paths;
 #[cfg(windows)]
 pub mod protocols;
+pub mod redirects;
 #[cfg(windows)]
 pub mod registry;
 pub mod revision;

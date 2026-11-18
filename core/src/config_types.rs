@@ -32,6 +32,28 @@ pub struct Config {
     /// Deep links definidos por el usuario para apps que el catálogo no conoce.
     #[serde(default)]
     pub custom_deeplinks: Vec<CustomDeepLink>,
+    /// Redirecciones, antes de las reglas. Sin el campo (config anterior) se usan las de fábrica.
+    #[serde(default = "default_redirects")]
+    pub redirects: Vec<Redirect>,
+}
+
+/// Redirección: los enlaces que coinciden con `from` (dominio y ruta opcional, como una regla) se abren
+/// como `to`, que es otro enlace `http(s)` o la URI de una app (`whatsapp://`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Redirect {
+    pub id: String,
+    pub from: String,
+    pub to: String,
+}
+
+/// Redirecciones de fábrica: la página "descarga la app" de Reddit (en el escritorio no sirve y
+/// termina en un artículo de ayuda) lleva a la portada. Se puede editar o borrar.
+pub fn default_redirects() -> Vec<Redirect> {
+    vec![Redirect {
+        id: "rd1".into(),
+        from: "reddit.com/mobile/download".into(),
+        to: "https://www.reddit.com/".into(),
+    }]
 }
 
 /// Deep link propio: enlaces de `domains` → `template` (`{url}`, `{host}`, `{path}`, `{query}`).
@@ -55,6 +77,7 @@ impl Default for Config {
             extra_tracking_params: Vec::new(),
             app_links: Vec::new(),
             custom_deeplinks: Vec::new(),
+            redirects: default_redirects(),
         }
     }
 }

@@ -35,6 +35,7 @@ fn cfg() -> Loaded {
         extra_tracking_params: vec!["ref".into()],
         app_links: vec![],
         custom_deeplinks: vec![],
+        redirects: vec![],
     })
 }
 

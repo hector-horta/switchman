@@ -143,7 +143,7 @@ pub fn preview(link: &CustomDeepLink, example: &str) -> Preview {
 }
 
 /// Protocolo válido: minúsculas ASCII, dígitos y + - . (empieza con letra), sin los prohibidos.
-fn valid_scheme(scheme: &str) -> bool {
+pub(crate) fn valid_scheme(scheme: &str) -> bool {
     !scheme.is_empty()
         && scheme.len() <= MAX_SCHEME
         && scheme

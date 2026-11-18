@@ -8,6 +8,9 @@ public sealed record Browser(string Id, string Name, string ExePath, IReadOnlyLi
 /// <summary>Regla dominio/ruta → navegador.</summary>
 public sealed record Rule(string Id, string Pattern, string BrowserId, bool StripTracking = true);
 
+/// <summary>Redirección: enlaces que coinciden con <see cref="From"/> (como una regla) se abren como <see cref="To"/>.</summary>
+public sealed record Redirect(string Id, string From, string To);
+
 /// <summary>Contenido de <c>config.json</c>.</summary>
 public sealed record LinkConfig(
     string DefaultBrowserId,
@@ -17,7 +20,9 @@ public sealed record LinkConfig(
     IReadOnlyList<string> ExtraTrackingParams,
     IReadOnlyList<string>? AppLinks = null,
     // Nombre fijo: SnakeCaseLower lo escribiría "custom_deep_links" y serde (Rust) lo ignoraría.
-    [property: JsonPropertyName("custom_deeplinks")] IReadOnlyList<CustomDeepLink>? CustomDeepLinks = null)
+    [property: JsonPropertyName("custom_deeplinks")] IReadOnlyList<CustomDeepLink>? CustomDeepLinks = null,
+    // Null solo en una config nueva: se omite al guardar y el CLI pone las de fábrica.
+    IReadOnlyList<Redirect>? Redirects = null)
 {
     /// <summary>Igual que un config.json vacío (limpieza de rastreo activada).</summary>
     public static LinkConfig Empty { get; } = new("", true, [], [], []);

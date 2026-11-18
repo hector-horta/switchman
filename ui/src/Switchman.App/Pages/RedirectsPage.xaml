@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Switchman.App.Pages.RedirectsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:res="using:Switchman.Core.Resources"
+    xmlns:app="using:Switchman.App"
+    xmlns:vm="using:Switchman.Core.ViewModels"
+    x:DefaultBindMode="OneWay">
+    <Grid Padding="36,24,36,36" RowSpacing="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind res:Strings.NavRedirects, Mode=OneTime}"/>
+            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
+                       Text="{x:Bind res:Strings.RedirectsIntro, Mode=OneTime}"/>
+            <InfoBar Margin="0,16,0,0" Visibility="{x:Bind app:Ui.VisibleIfText(ViewModel.Message)}" IsClosable="False" IsOpen="{x:Bind app:Ui.HasText(ViewModel.Message)}"
+                 Severity="{x:Bind app:Ui.SeverityOf(ViewModel.MessageKind)}"
+                 Message="{x:Bind ViewModel.Message}" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnSpacing="24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    CornerRadius="{ThemeResource OverlayCornerRadius}" Padding="4">
+                <ListView ItemsSource="{x:Bind ViewModel.Redirects}" SelectedItem="{x:Bind ViewModel.SelectedRedirect, Mode=TwoWay}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:RedirectItem">
+                            <StackPanel Padding="0,8">
+                                <TextBlock Text="{x:Bind Title}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="{x:Bind To}" Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Border>
+
+            <Border Grid.Column="1" VerticalAlignment="Top" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    CornerRadius="{ThemeResource OverlayCornerRadius}" Padding="16"
+                    Visibility="{x:Bind ViewModel.HasSelection}">
+                <StackPanel Spacing="16">
+                    <StackPanel Spacing="4">
+                        <TextBox Header="{x:Bind res:Strings.RedirectsFrom, Mode=OneTime}" TextWrapping="Wrap"
+                                 Text="{x:Bind ViewModel.SelectedRedirect.From, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" Text="{x:Bind res:Strings.RedirectsFromHelp, Mode=OneTime}"/>
+                    </StackPanel>
+                    <TextBox Header="{x:Bind res:Strings.RedirectsTo, Mode=OneTime}" TextWrapping="Wrap"
+                             Text="{x:Bind ViewModel.SelectedRedirect.To, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Content="{x:Bind res:Strings.RedirectsRemove, Mode=OneTime}" Command="{x:Bind ViewModel.RemoveRedirectCommand}"
+                            CommandParameter="{x:Bind ViewModel.SelectedRedirect}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+            <Button Content="{x:Bind res:Strings.RedirectsAdd, Mode=OneTime}" Command="{x:Bind ViewModel.AddRedirectCommand}"/>
+            <Button Content="{x:Bind res:Strings.Save, Mode=OneTime}" Style="{StaticResource AccentButtonStyle}"
+                    Command="{x:Bind ViewModel.SaveCommand}"/>
+        </StackPanel>
+    </Grid>
+</Page>
